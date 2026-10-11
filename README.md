@@ -18,7 +18,21 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
 
 ## Install
 
-Requires Python 3.8+ (standard library only). From a checkout of this repository:
+Requires Python 3.8+ (standard library only) and git.
+
+**Without a checkout**, `tools/bootstrap.sh` (macOS/Linux) and `tools/bootstrap.ps1` (Windows) fetch a shallow clone of this repository into a temp directory, run the installer, and delete the clone again:
+
+```bash
+curl -fsSL <raw-url-of-tools/bootstrap.sh> | sh -s -- <this-repo-url> path/to/your-repo --dry-run
+```
+
+```powershell
+iex "& { $(irm <raw-url-of-tools/bootstrap.ps1>) } -RepoUrl <this-repo-url> -Target path/to/your-repo --dry-run"
+```
+
+Set `AIWORKSPACE_REPO_URL` (sh: env var: `AIWORKSPACE_REPO_URL=<this-repo-url>`; PowerShell: `$env:AIWORKSPACE_REPO_URL`) to drop the repo-url argument from every call — handy as a saved alias. Drop `--dry-run` to actually install.
+
+**From a checkout** of this repository:
 
 ```bash
 python tools/install.py path/to/your-repo --dry-run   # preview
