@@ -6,6 +6,23 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
 
 ---
 
+## Quickstart
+
+No checkout needed — this fetches a shallow clone to a temp directory, runs the installer, and cleans up:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MigaelHartzenberg-Coder/aiworkspace/master/tools/bootstrap.sh \
+  | sh -s -- https://github.com/MigaelHartzenberg-Coder/aiworkspace path/to/your-repo
+```
+
+```powershell
+iex "& { $(irm https://raw.githubusercontent.com/MigaelHartzenberg-Coder/aiworkspace/master/tools/bootstrap.ps1) } -RepoUrl https://github.com/MigaelHartzenberg-Coder/aiworkspace -Target path\to\your-repo"
+```
+
+Add `--dry-run` to preview first. See [Install](#install) below for the from-a-checkout form, what gets written, and upgrading.
+
+---
+
 ## What you get
 
 - **A 6-step gated lifecycle** — `define` → `plan` → `resources/` → `processing/` → `finalized/` → `promote`. Agents never advance a step without explicit human approval.

@@ -29,7 +29,7 @@ LEFTOVER_PATTERNS = [
     (r"etl-pipeline|task-management-system|task-engine|pluscode|bulk-feasibility|ui-test-agent", "original workspace name"),
     (r"CLIENT_DAILY_SUMMARY|DESTINATION_TABLE", "original project config"),
     (r"workflow-improvements-planning", "reference to a planning doc that was not extracted"),
-    (r"migaelhartzenberg", "personal path"),
+    (r"[/\\]migaelhartzenberg(?=[/\\]|$)", "personal path"),
     (r"file:///", "absolute file URL"),
     (r"(?<![\w.])/Users/[^/\s]+/|[A-Za-z]:\\Users\\", "absolute user path"),
 ]

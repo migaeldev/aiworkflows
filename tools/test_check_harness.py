@@ -67,6 +67,16 @@ class LeftoverNamesTest(CheckTestCase):
         self.write("x.md", "e.g. Flask `TestClient`, BigQuery `ScalarQueryParameter`, `billing-insights`.\n")
         self.assertEqual(check.check_leftovers(self.root), [])
 
+    def test_personal_path_pattern_is_path_bound_not_a_bare_substring(self):
+        # The same name legitimately appears in this fork's distribution URL (a GitHub
+        # account, not a leftover filesystem path) and must not be flagged there.
+        self.write("x.md", "Clone https://github.com/MigaelHartzenberg-Coder/aiworkspace.\n")
+        self.assertEqual(check.check_leftovers(self.root), [])
+
+    def test_still_flags_the_personal_path_itself(self):
+        self.write("y.md", "See /Users/migaelhartzenberg/Projects/old-repo\nC:\\Users\\migaelhartzenberg\\x\n")
+        self.assertEqual(len(check.check_leftovers(self.root)), 2)
+
     def test_scans_text_files_but_not_binaries_or_its_own_sources(self):
         self.write("tools/x.py", "NAME = '28east'\n")
         (self.root / "logo.png").write_bytes(b"\x89PNG 28east")
