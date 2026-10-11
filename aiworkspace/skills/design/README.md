@@ -8,9 +8,12 @@ timestamp: 2026-09-09T13:52:28+02:00
 
 # Design Skills
 
-This category contains skills related to visual design, branding, and user interface aesthetics. Use these skills to ensure that all visual outputs adhere to 28East brand guidelines and Google Maps Premier Partner visual standards.
+This category contains skills related to visual design, branding, and user interface aesthetics. All UI/UX work follows `brand-guidelines`, with a brand-onboarding check first while the brand is still `pending` (`AGENTS.md` Directive #4).
 
 ## Available Skills
 
-### [`28east-brand-guidelines`](./brand-guidelines/SKILL.md)
-Applies 28East's official brand colors, Google Maps Premier Partner aesthetics, location intelligence visual identity, and typography — implemented through Google Material Design 3 — to UI components and digital artifacts. Requires pairing with `frontend-design` and `visual-iteration` whenever frontend UI is being built.
+### [`brand-guidelines`](./brand-guidelines/SKILL.md)
+The design system for all UI work — Material Design 3 structure and `color-mix()` derivation rules, filled with `aiworkspace/brand/brand.md` values or neutral template defaults. Pairs with `frontend-design` and `visual-iteration`.
+
+### [`brand-onboarding`](./brand-onboarding/SKILL.md)
+Capture the brand, its files and artifacts, and the UI technology into `aiworkspace/brand/` (detect existing tokens, then grill-me), or settle on template defaults. Command: `/brand`. Also runs during `setup` and before any UI work while Brand is `pending`.

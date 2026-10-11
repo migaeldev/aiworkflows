@@ -8,6 +8,8 @@ license: Complete terms in LICENSE.txt
 timestamp: 2026-09-09T14:02:14+02:00
 ---
 
+> **Brand first.** Before designing, apply [`design/brand-guidelines`](../../design/brand-guidelines/SKILL.md). If Brand in `aiworkspace/project.md` is `pending`, run [`design/brand-onboarding`](../../design/brand-onboarding/SKILL.md)'s opening question first. Brand values (colors, fonts, design system) override the generic aesthetic advice below; this skill governs how well the brand is executed.
+
 This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.
 
 The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.

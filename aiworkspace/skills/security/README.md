@@ -20,4 +20,4 @@ This directory contains security skills formatted according to Google's Open Kno
 | **`security-code-audit`** | Application vulnerability review, OWASP Top 10, input sanitization, and CORS analysis. | [`security-code-audit/SKILL.md`](./security-code-audit/SKILL.md) | 🟢 Active |
 | **`dos-resilience-audit`** | Application DoS review, ReDoS detection, payload caps, rate limiting, and resource bounds. | [`dos-resilience-audit/SKILL.md`](./dos-resilience-audit/SKILL.md) | 🟢 Active |
 | **`mitm-prevention-audit`** | Transport security, TLS/SSL configuration, HSTS headers, and HTTP client validation. | [`mitm-prevention-audit/SKILL.md`](./mitm-prevention-audit/SKILL.md) | 🟢 Active |
-| **`sql-injection-audit`** | SQL injection, parameterized BigQuery query verification, and ORM query audit. | [`sql-injection-audit/SKILL.md`](./sql-injection-audit/SKILL.md) | 🟢 Active |
+| **`sql-injection-audit`** | SQL/NoSQL injection, query parameterization (relational, analytical, and document stores), and ORM raw-query audit. | [`sql-injection-audit/SKILL.md`](./sql-injection-audit/SKILL.md) | 🟢 Active |

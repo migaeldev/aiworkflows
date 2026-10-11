@@ -15,6 +15,9 @@ This category contains skills related to software engineering, code review, test
 ### [`code-review`](./code-review/SKILL.md)
 Review code like a skeptical senior engineer on two axes — standards/quality and spec fidelity. Surface hidden assumptions, check for over-engineering, verify test coverage, and check requirements weren't silently descoped.
 
+### [`codebase-map`](./codebase-map/SKILL.md)
+With permission, map the host codebase into `aiworkspace/codebase-map.md` — stack, structure, design patterns, conventions, comment scheme, and change recipes for where/how to make changes. Command: `/map`.
+
 ### [`codebase-design`](./codebase-design/SKILL.md)
 Shared vocabulary and principles for module depth, interfaces, and seams — the deletion test, "the interface is the test surface," and the design-it-twice parallel sub-agent pattern for exploring alternative interfaces.
 

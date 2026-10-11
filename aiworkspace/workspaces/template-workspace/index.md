@@ -16,7 +16,7 @@ Welcome to the **<Workspace Title>** domain workspace, formatted according to th
 
 _Check [`aiworkspace/host.md`](../../host.md)'s `host_mode` before filling this in — it determines which of the two subsections below applies. Delete whichever one doesn't._
 
-### If `host_mode: monorepo` (the default; this repo's own mode)
+### If `host_mode: monorepo`
 
 - **Canonical Production Code**: `apps/<workspace>/`
 - **Production README**: `apps/<workspace>/README.md`
@@ -49,14 +49,14 @@ _Check [`aiworkspace/host.md`](../../host.md)'s `host_mode` before filling this 
 
 ---
 
-## 🎭 Domain Identity, Tone & Specific Instructions
+## 🎭 Domain Identity, Directives & Glossary
 
 _Filled in by `productivity/plan` running in Project Plan mode (invoked via `productivity/new-workspace`'s Step 3) — this section stays a placeholder until that interview runs. Never pre-fill it with another workspace's real content._
 
 - **Domain Purpose**: _[placeholder]_
-- **Identity & Persona**: _[placeholder]_
-- **Tone**: _[placeholder]_
+- **Persona**: inherits the project soul (`aiworkspace/soul.md`). _If this workspace needs a different voice or code style, run `/persona` at workspace scope to create `./soul.md` and link it here._
 - **Domain Directives**: _[placeholder — numbered list of constraints]_
+- **Glossary**: _[domain terms, added by `engineering/domain-modeling` as they're named]_
 
 ---
 

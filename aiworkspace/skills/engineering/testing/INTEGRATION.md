@@ -2,7 +2,7 @@
 type: resource
 name: testing-integration
 title: Integration Testing
-description: Scope, speed, and tooling conventions for integration tests in this repo.
+description: Scope, speed, and tooling conventions for integration tests.
 tags: [testing, integration]
 timestamp: 2026-10-04T00:00:00+02:00
 ---
@@ -19,9 +19,10 @@ Two or more real collaborators wired together, inside a single service boundary 
 ## Speed & isolation
 Slower than unit tests and allowed to be — they may hit a real local DB, emulator, or sandboxed API. Still shouldn't depend on production data or external services that aren't reproducible in CI.
 
-## Tooling (this repo)
-- Backend: `pytest` against a real local/test BigQuery dataset or emulator where available, or a disposable test database — not the production `CLIENT_DAILY_SUMMARY_TABLE`/`DESTINATION_TABLE`.
-- Frontend: integration tests that exercise the Next.js Studio's API proxy against a real (local/dev) Flask instance rather than a fully mocked one.
+## Tooling
+- Use the runner(s) recorded in `aiworkspace/project.md`.
+- Data stores: a disposable local/test database, container, or official emulator — never production tables or datasets.
+- Frontend: exercise the app's API layer against a real local/dev backend instance rather than a fully mocked one.
 
 ## Anti-patterns
 - Mocking the one collaborator the test exists to verify.

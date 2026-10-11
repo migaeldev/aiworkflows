@@ -2,29 +2,38 @@
 type: skill
 name: setup
 title: Setup (Repository Onboarding)
-description: One-time bootstrap for installing aiworkspace into a repository — detect host context, record host_mode in aiworkspace/host.md, then scaffold the first workspace via new-workspace. Use when aiworkspace's files already exist on disk in a repo but haven't been initialized yet, or the user asks to set up/onboard aiworkspace here.
+description: One-time bootstrap after the aiworkspace harness files are copied into a repository — detect the stack, record host_mode and project conventions, map the codebase (with permission), onboard the brand (or use template defaults), create the project persona (soul.md), then scaffold the first workspace via new-workspace. Use when aiworkspace/host.md reads host_mode unset, or the user asks to set up/onboard aiworkspace here.
 tags: [skill, productivity, setup, onboarding, host-mode]
-timestamp: 2026-10-04T00:00:00+02:00
+timestamp: 2026-10-11T00:00:00+02:00
 ---
 
 # Setup (Repository Onboarding)
 
 ## Trigger
-Use once per repository, after the `aiworkspace/` files and skills are already present on disk (getting them there is a separate, currently-manual step — see Notes) but before any workspace has been defined. Not re-run routinely.
+Use once per repository, after the harness files (`aiworkspace/`, `AGENTS.md`, `CLAUDE.md`) are on disk and `aiworkspace/host.md` reads `host_mode: unset`. It isn't re-run routinely. Each later concern has its own skill: re-map with `/map`, rebrand with `/brand`, change the persona with `/persona`.
+
+Tell the user up front what the steps are and that each optional one can be skipped.
 
 ## Process
 
-1. **Detect host context** — scan the repo root for existing manifests (`package.json`, `requirements.txt`, `go.mod`, etc.) and check whether an `apps/` folder already exists.
+1. **Detect host context** (top level only, no deep reading yet), looking for:
+   - manifests and lockfiles: `package.json` + `pnpm-lock.yaml`/`yarn.lock`/`package-lock.json`/`bun.lockb`, `pyproject.toml`/`requirements.txt`/`uv.lock`/`poetry.lock`, `go.mod`, `Cargo.toml`, `pom.xml`/`build.gradle`, …
+   - CI config: `.github/workflows/`, `.gitlab-ci.yml`, …
+   - an existing `apps/` folder or monorepo tooling: `pnpm-workspace.yaml`, `turbo.json`, `nx.json`
+   - existing agent files: `CLAUDE.md`, `AGENTS.md`, `.cursorrules`, …
 2. **Propose a `host_mode`**, don't assume it:
-   - `monorepo` if an `apps/<workspace>/`-style structure already fits (or is clearly intended).
-   - `bolt-on` if this is an existing codebase with its own structure and no `apps/` pattern.
-   - Confirm with the user either way — never silently decide (`AGENTS.md` Directive #1).
-3. **Record `host_mode`** in `aiworkspace/host.md` (OKF `type: resource` — see this repo's own `aiworkspace/host.md` for the shape). This is the single source of truth `AGENTS.md` Directive #6 and `productivity/promote` both read.
-4. **Grill-me interview** — invoke [`productivity/grill-me`](../grill-me/SKILL.md) to learn: the project's overall purpose, whether one or multiple domain workspaces are expected now, and — **in `bolt-on` mode specifically** — where in the host repo different kinds of production code should land. This seeds the first workspace's Production Target Map (a new section in its `index.md`, used only in `bolt-on` mode).
-5. **Scaffold the first workspace by delegating to [`productivity/new-workspace`](../new-workspace/SKILL.md)** — don't duplicate its scaffolding/interview logic here.
-6. **Confirm `AGENTS.md`/`CLAUDE.md` reflect the recorded `host_mode`** — in `bolt-on` mode, the immutability wording in both files should already describe "everything outside `aiworkspace/` is read-only except via the Production Target Map" (this repo's own copies already handle the branch; a freshly-bolted-on repo gets these files copied in, per Notes, and should not need further editing here).
-7. **Present & gate** — wait for explicit confirmation before any Step 0/1 work begins.
+   - `monorepo` — the repo is new/empty, or already organized as `apps/<name>/`.
+   - `bolt-on` — an existing codebase with its own structure.
+   - Confirm with the user either way (`AGENTS.md` Directive #1), then record it in `aiworkspace/host.md` in place of `unset`.
+3. **Fill in `aiworkspace/project.md` — Project, Stack & Tooling, and Directives.** Propose values from step 1: name, purpose, languages, package manager, install/build/lint/test commands. Confirm them with the user and write them in. Ask about project-wide rules (e.g. "pnpm only", "no new dependencies without approval") and list them under Project-Specific Directives. Carry over relevant rules from any pre-existing agent files.
+4. **Codebase map (asks permission)** — run [`engineering/codebase-map`](../../engineering/codebase-map/SKILL.md). It asks permission before reading anything, writes `aiworkspace/codebase-map.md`, settles the **Comment policy** (asking the user when the code has no consistent comment scheme), and fills any Stack & Tooling rows still unset. If the user declines, it records `declined` and setup continues.
+5. **Brand** — run [`design/brand-onboarding`](../../design/brand-onboarding/SKILL.md). It asks whether to onboard the brand now. If yes, it detects existing tokens, runs a grill-me interview on brand and UI technology, and writes the `aiworkspace/brand/` folder: `brand.md`, plus any logos, fonts, tokens, docs, and reference artifacts. If no, it records `template-defaults`. If "not now", it leaves `pending`, and the question comes back at the first UI task. If the project has no UI at all, record `template-defaults` and move on.
+6. **Project persona** — run [`productivity/persona`](../persona/SKILL.md) at **project** scope to create `aiworkspace/soul.md`. It's built from the codebase map, `project.md`, and `brand/brand.md`, with grill-me filling the gaps. If the user skips it, set **Persona** in `project.md` to `declined`.
+7. **Merge agent instructions** — if the repo already had its own `CLAUDE.md`/`AGENTS.md` before the harness was copied in, make sure it points at the harness `AGENTS.md` rather than being overwritten, and that the two don't contradict each other. Surface any conflicts to the user, and only edit those files with their approval.
+8. **Workspaces interview** — invoke [`productivity/grill-me`](../grill-me/SKILL.md) to learn whether one or several domain workspaces are expected now. **In `bolt-on` mode**, also learn where different kinds of production code should land. The codebase map's Change Recipes and Module Map make good proposals. This seeds the first workspace's Production Target Map.
+9. **Scaffold the first workspace by delegating to [`productivity/new-workspace`](../new-workspace/SKILL.md)**. Don't duplicate its logic here.
+10. **Present & gate** — show everything written (`host.md`, `project.md`, `codebase-map.md`, `brand/`, `soul.md`, the new workspace) and anything skipped. Wait for explicit confirmation before any Step 0/1 work begins.
 
 ## Notes
-- **Getting the files here in the first place (Step A) is still manual.** `aiworkspace` isn't published anywhere yet; a future one-line fetch (e.g. `npx degit <org>/aiworkspace-template aiworkspace`) is planned but not built — see `workflow-improvements-planning-claude.md` §7. For now, this skill assumes `aiworkspace/`, `AGENTS.md`, `CLAUDE.md`, and the `.claude/skills/` adapters are already present (copied in by hand).
-- Never write to `apps/[workspace]` or (in `bolt-on` mode) anywhere outside `aiworkspace/` from this skill — scaffolding only.
+- Getting the harness files into the repo is a separate step: a manual copy for now (see the planned installer in the root `README.md` roadmap).
+- This skill and the skills it delegates to write only inside `aiworkspace/`, plus the agent-instruction merge in step 7 with the user's approval. Never write to `apps/` or other production code from here.

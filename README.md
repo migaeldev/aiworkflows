@@ -1,124 +1,91 @@
-# Insights Project
+# aiworkspace harness
 
-Welcome to the **Insights** repository. This project is built on **Google's Open Knowledge Format (OKF v0.1)** and a **4-Stage Lifecycle Pipeline** to develop, audit, and deploy domain-driven AI knowledge systems and applications.
+A drop-in, agent-agnostic workflow harness for AI-assisted development. Add it to any repository, run `setup`, and every AI agent working there (Claude Code, Codex, Gemini, Antigravity, …) follows the same gated lifecycle, guardrails, and skills.
 
----
-
-## 🏛️ System Architecture
-
-The repository is structured around a strict separation between AI Domain Knowledge (`aiworkspace/`), Reusable Project Skills (`aiworkspace/skills/`), and Canonical Production Applications (`apps/`).
-
-```mermaid
-graph TD
-    Root["Insights Repository Root"] --> Agents["AGENTS.md (Operating Directives)"]
-    Root --> Apps["apps/ (Production Applications)"]
-    Root --> AIWorkspace["aiworkspace/ (OKF v0.1 Root)"]
-
-    Apps --> FeasibilityApp["apps/feasibility-insights/"]
-    FeasibilityApp --> AppBackend["app/ (Hexagonal Python Backend)"]
-    FeasibilityApp --> AppUI["ui/ (Next.js Workbench)"]
-
-    AIWorkspace --> Index["index.md (Central Registry)"]
-    AIWorkspace --> Skills["skills/ (Skills Registry)"]
-    AIWorkspace --> Workspaces["workspaces/ (Domain Workspaces)"]
-
-    Skills --> DesignSkill["design/ (28East Brand Guidelines)"]
-    Skills --> EngSkill["engineering/ (Diagnose, Frontend)"]
-    Skills --> ProdSkill["productivity/ (Handoffs, Compression)"]
-    Skills --> SecSkill["security/ (Security Audits, CI/CD)"]
-
-    Workspaces --> FeasibilityDomain["feasibility-insights/"]
-    FeasibilityDomain --> Step1["1. resources/ (Input Context)"]
-    FeasibilityDomain --> Step2["2. processing/ (Active Iteration)"]
-    FeasibilityDomain --> Step3["3. finalized/ (Audited Gates & Specs)"]
-    FeasibilityDomain --> Step4["4. promote (Action)"]
-
-    Step4 -. Promotes to .-> FeasibilityApp
-```
+Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and workspace document is plain Markdown with YAML frontmatter, so it is readable by humans and any agent alike.
 
 ---
 
-## 🔄 The 4-Stage Lifecycle Pipeline
+## What you get
 
-All application development and domain knowledge generation follow a 4-step lifecycle:
+- **A 5-step gated lifecycle** — `planning/` → `resources/` → `processing/` → `finalized/` → `promote`. Agents never advance a step without explicit human approval.
+- **A production immutability guardrail** — AI edits happen in a sandboxed `processing/` folder; only a human-issued `promote` touches production code.
+- **A skills library** — engineering (codebase mapping, code review, testing, diagnosis, architecture), security audits, productivity (planning, personas, handoffs, context management), and brand onboarding on top of a Material Design 3 template.
+- **Project context agents actually use** — a codebase map of where and how to change code, and a `soul.md` persona so agents write in your project's languages, patterns, and voice.
+- **Domain workspaces** — each area of work gets its own identity, tone, directives, plans, and audit log.
+
+---
+
+## Install
+
+> Automated install is planned (see the roadmap below). For now it is a manual copy.
+
+1. Copy into the root of the target repository:
+   - `aiworkspace/`
+   - `AGENTS.md`
+   - `CLAUDE.md` *(if the repo already has one, append a pointer to `AGENTS.md` instead of overwriting it)*
+2. Open the repo in your agent and run **`/setup`** (or ask it to "set up aiworkspace"). Setup will:
+   - detect your stack and propose a `host_mode`,
+   - write `aiworkspace/host.md` and `aiworkspace/project.md`,
+   - **with your permission**, map the codebase into `aiworkspace/codebase-map.md` (languages, structure, patterns, conventions, comment scheme, and where/how to make each kind of change),
+   - onboard your brand, its files, and your UI stack into `aiworkspace/brand/`, or use the neutral template defaults,
+   - create `aiworkspace/soul.md`, a persona so agents speak and code *as your project*,
+   - scaffold your first workspace via `new-workspace`.
+
+### Host modes
+
+| Mode | Use when | Production code lives in |
+| :--- | :--- | :--- |
+| `monorepo` | New repo, or one already organized as `apps/<name>/` | `apps/<workspace>/` |
+| `bolt-on` | Existing codebase with its own structure | Wherever each workspace's **Production Target Map** says |
+
+---
+
+## The lifecycle
 
 ```text
-[Step 1: resources/] ──> [Step 2: processing/] ──> [Step 3: finalized/] ──> [Step 4: promote] ──> [apps/<workspace>/]
-  (Input Context)           (Active Iteration)         (Audited Gates & Specs)      (Human Deployment)       (Production Application)
+[0: planning/] ──> [1: resources/] ──> [2: processing/] ──> [3: finalized/] ──> [4: promote] ──> [production]
+ plan & research     input context      active iteration     audited & gated     human-only
 ```
 
-1. **`resources/` (Step 1 - Input Context)**: Contains raw inputs, specifications, BigQuery schemas, and context required for the domain task.
-2. **`processing/` (Step 2 - Active Iteration)**: Active development environment where AI and human developers iterate, build features, and write tests.
-3. **`finalized/` (Step 3 - Verification Gates & Audit)**: Audited stage. Moving code here requires passing four mandatory gates:
-   - 🛡️ **Security Audit Checks** (`ci-cd-security-review`, `security-code-audit`) logged in `log.md`.
-   - 📖 **OpenAPI Specs Generation** (`openapi.json` for REST APIs).
-   - 📄 **Production Documentation** (Master architecture diagrams & specs).
-   - 🧪 **System Verification & Tests** (Compilation, linting, and test suites).
-4. **`promote` (Step 4 - Production Deployment)**: Human-triggered command that deploys audited code from `finalized/` to canonical production in `apps/<workspace>/`.
-   - Populates `apps/<workspace>/README.md` as a standalone master guide.
-   - Updates this root [`README.md`](./README.md) to add or update the application entry in the directory structure and quick links navigation table.
-   - Updates `aiworkspace/index.md` to point to `apps/<workspace>/` as the canonical production application location.
+| Step | Command | What happens |
+| :--- | :--- | :--- |
+| — | `/map` | Create or refresh the codebase map (`codebase-map.md`) |
+| — | `/brand` | Onboard or change the brand (`brand/`), or choose template defaults |
+| — | `/persona` | Create or change the project or a workspace persona (`soul.md`) |
+| 0 | `/plan` | Project or Feature/Change plan, via a `grill-me` interview |
+| 1 | `/resources` | Collect the context, schemas, and data the plan calls for |
+| 2 | `/process` | Iterate on code and content inside `processing/` |
+| 3 | `/finalize` | Security audit, API spec (if applicable), docs, tests, dual-axis code review |
+| 4 | `/promote` | Human-authorized copy to production |
+
+Full specification: [`aiworkspace/README.md`](./aiworkspace/README.md).
 
 ---
 
-## 🔒 Immutability Guardrail & Production Apps (`apps/`)
-
-- **Strict Immutability Rule**: No AI agent or automated assistant may directly edit code inside `apps/[workspace]`.
-- **Development Workflow**: All feature requests, fixes, and updates are developed in `aiworkspace/workspaces/[workspace]/processing/` and moved through `finalized/` before human-authorized promotion to `apps/[workspace]`.
-- **Standalone Production README Standard**: Every production app in `apps/<workspace>/` includes a standalone master guide (`README.md`) with developer setup instructions, complete environment variable tables, and inline `.env.template` definitions.
-- **Root README Synchronization**: Upon executing `promote`, the model must update this root [`README.md`](./README.md) to register the newly promoted application entry.
-
----
-
-## 🎨 Design & Package Standards
-
-- **Brand Compliance**: User interfaces follow the official **28East Brand Guidelines** ([`aiworkspace/skills/design/brand-guidelines/`](./aiworkspace/skills/design/brand-guidelines/SKILL.md)).
-- **Typography**: Default web typography uses **`Roboto`** (`Roboto`, `Google Sans`, `Inter`).
-- **Color Palette**: Dark Navy (`#0A1128`), Container Slate (`#0B192C`), Brand Red (`#E31B23`), Slate Grey (`#414A51`), Premier Blue (`#1A73E8`), Signal Green (`#34A853`).
-- **Package Manager**: Mandatory usage of **`pnpm`** across all Node.js / Next.js / frontend projects.
-
----
-
-## 📁 Repository Directory Layout
+## Layout
 
 ```text
 .
-├── AGENTS.md                           # Core AI agent instructions & operating guardrails
-├── README.md                           # Root repository documentation (This file)
-├── requirements.txt                    # Top-level Python dependencies
-├── apps/                               # Canonical production applications
-│   └── feasibility-insights/           # Feasibility Insights production app
-│       ├── README.md                   # Standalone production guide & inline .env.template
-│       ├── app/                        # Python backend service (Hexagonal Architecture)
-│       └── ui/                         # Next.js Fine-Tuning Studio & Workbench
-└── aiworkspace/                        # OKF v0.1 Knowledge Base Root
-    ├── README.md                       # AI Workspace architecture & route specifications
-    ├── index.md                        # Central registry for workspaces & skills
-    ├── skills/                         # Integrated Skills Registry
-    │   ├── README.md                   # Skills index & usage rules
-    │   ├── design/                     # 28East brand guidelines skill & assets
-    │   ├── engineering/                # Diagnostic & frontend design skills
-    │   ├── productivity/               # Workflow, handoff & skill authoring skills
-    │   └── security/                   # Security review & code audit skills
-    └── workspaces/                     # Domain Workspaces
-        ├── template-workspace/         # Starter template for new domain workspaces
-        └── feasibility-insights/       # Feasibility Insights domain workspace
-            ├── index.md                # Domain entry point, identity & production pointer
-            ├── log.md                  # Chronological lifecycle & security audit log
-            ├── resources/              # Step 1: Schemas, logs, PDF reports & source data
-            ├── processing/             # Step 2: Active dev iteration workspace
-            └── finalized/              # Step 3: Audited code, OpenAPI specs & test logs
+├── AGENTS.md                     # Agent-agnostic operating rules (source of truth)
+├── CLAUDE.md                     # Claude Code pointer to AGENTS.md
+└── aiworkspace/
+    ├── README.md                 # Architecture, lifecycle & slash-command spec
+    ├── index.md                  # Registry of workspaces & skills (filled as you go)
+    ├── host.md                   # host_mode — written by setup
+    ├── project.md                # Project conventions — written by setup
+    ├── codebase-map.md           # Where/how to change code — setup, with permission
+    ├── brand/                    # Brand values, logos, fonts, tokens, docs & references — /brand (optional)
+    ├── soul.md                   # Project persona — /persona
+    ├── skills/                   # design / engineering / productivity / security
+    └── workspaces/
+        └── template-workspace/   # Boilerplate copied by new-workspace
 ```
 
 ---
 
-## 🚀 Navigation & Quick Links
+## Roadmap
 
-| Resource | Path | Description |
-| :--- | :--- | :--- |
-| **Agent Directives** | [`AGENTS.md`](./AGENTS.md) | Operating rules, identity standards, and guardrails |
-| **Workspace Spec** | [`aiworkspace/README.md`](./aiworkspace/README.md) | OKF v0.1 architecture & 4-step pipeline guide |
-| **Central Registry** | [`aiworkspace/index.md`](./aiworkspace/index.md) | Central registry of domain workspaces & skills |
-| **Skills Registry** | [`aiworkspace/skills/README.md`](./aiworkspace/skills/README.md) | Master index of available project AI skills |
-| **Feasibility Domain** | [`aiworkspace/workspaces/feasibility-insights/index.md`](./aiworkspace/workspaces/feasibility-insights/index.md) | Active domain entry point & domain instructions |
-| **Production App** | [`apps/feasibility-insights/README.md`](./apps/feasibility-insights/README.md) | Feasibility Insights production deployment guide |
+- [ ] Installer (`npx degit` / install script) that copies the harness and merges into an existing `CLAUDE.md`/`AGENTS.md` without overwriting
+- [ ] `.claude/skills/` adapters so lifecycle commands appear as native Claude Code slash commands
+- [ ] Link checker and "no leftover project names" check for the harness itself

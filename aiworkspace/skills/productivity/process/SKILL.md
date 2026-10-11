@@ -15,7 +15,7 @@ Use for each round of active iteration inside `aiworkspace/workspaces/<domain>/p
 ## Process
 1. **Confirm scope.** If this unit of work has a Step 0 plan (`planning/project-plan.md` or a `planning/features/<slug>/spec.md`), work against it. If not, per `engineering/software-engineer`'s mandated behavior #1, that skill will require one before code gets written — this skill doesn't bypass that.
 2. **If the work involves writing or modifying code**, load [`engineering/software-engineer`](../../engineering/software-engineer/SKILL.md) — mandatory per `AGENTS.md` Directive #8, not optional here either.
-3. **Do the round of work** — generation, editing, refinement — entirely inside `processing/`. Never touch `apps/[workspace]` directly (Directive #6).
+3. **Do the round of work** — generation, editing, refinement — entirely inside `processing/`. Never touch production code directly (Directive #6).
 4. **Report what changed** this round and what's left, rather than silently continuing to the next round unprompted.
 5. **Stop.** Do not move anything to `finalized/` from this skill. That's `productivity/finalize`'s job, triggered separately and explicitly.
 

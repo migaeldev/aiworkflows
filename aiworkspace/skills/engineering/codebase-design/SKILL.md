@@ -2,7 +2,7 @@
 type: skill
 name: codebase-design
 title: Codebase Design Vocabulary
-description: Shared vocabulary and principles for talking about module depth, interfaces, and seams — module, interface, depth, seam, adapter, leverage, locality — plus the deletion test and the design-it-twice pattern for exploring alternative interfaces. Also carries this repo's per-stack conventions (Python and Go hexagonal layout, frontend API/UI separation, testing, function design, logging). Use when reviewing architecture, naming a refactor, deciding whether a seam is real, or writing new code in any of this repo's stacks.
+description: Shared vocabulary and principles for talking about module depth, interfaces, and seams — module, interface, depth, seam, adapter, leverage, locality — plus the deletion test and the design-it-twice pattern for exploring alternative interfaces. Also carries default per-stack conventions (Python and Go hexagonal layout, frontend API/UI separation, testing, function design, logging). Use when reviewing architecture, naming a refactor, deciding whether a seam is real, or writing new code.
 tags: [skill, engineering, architecture, vocabulary, design, python, go, frontend, testing, logging]
 timestamp: 2026-10-05T12:00:00+02:00
 ---
@@ -39,54 +39,50 @@ A seam justifies itself when it has **two or more adapters that actually exist**
 When a deepened module's interface isn't obviously right, don't commit to the first shape. Spawn two (or three) parallel sub-agents, each handed the same problem statement and constraints but told nothing about the others' approach. Ask each to produce a candidate interface plus a one-paragraph rationale. Then compare: where they agree, that's probably the real shape; where they disagree, the disagreement usually points at an underspecified constraint worth resolving before writing code. This is cheap relative to building the wrong interface and discovering it three call sites later.
 
 ## Language & Stack Conventions
-The vocabulary above is language-agnostic; these are how this repo applies it per stack. New code in any of these stacks should hold itself to the matching section, not just the abstract principles.
+The vocabulary above is language-agnostic; these are default conventions for applying it per stack. **The host project's established layout wins**: if the repo already has a consistent structure, follow it and record it in `aiworkspace/project.md` — use the defaults below only for new services or where no convention exists yet.
 
 ### Python — hexagonal (`cmd/` + `internal/`)
-This is the layout [`apps/feasibility-insights/app`](../../../../apps/feasibility-insights/app) already uses, and the standard for any new Python service in this repo:
-
-- **`cmd/<entrypoint>/main.py`** holds driving adapters only — wiring, not logic. `cmd/api/main.py` (Flask, Cloud Run Service) and `cmd/cli/main.py` (batch runner, Cloud Run Job) are two real adapters driving the same core, which is exactly what justifies that seam (see "one adapter = hypothetical seam, two = real" above) — neither should contain business logic the other would have to duplicate.
-- **`internal/logic/`** is the hexagon's interior. `internal/logic/insights_engine.py`'s `run_insights_pipeline` is a deep module done right: a narrow interface (`client_name`, `relative_period`, `overwrite`) hides BigQuery extraction, Gemini generation, normalization, and a MERGE — deleting it would concentrate that complexity elsewhere, not remove it, which is the deletion test's "moves, don't inline" signal for keeping a module.
-- **`internal/config.py`** is the one adapter between the process environment and everything else. Nothing outside it should call `os.environ.get(...)` directly — that's the seam, and it's why `_normalize_table`'s table-name construction lives there instead of being copy-pasted at each call site.
-- **`internal/sql/`** is the driven-adapter side for BigQuery: parameterized `.sql` templates loaded through `load_and_format_sql`, not strings built ad hoc in `internal/logic/`.
-- Keep the pure helpers pure. `format_duration_human`, `truncate_to_complete_sentences`, and `safe_format_prompt` in `insights_engine.py` take plain data in and return plain data out, with no BigQuery, Gemini, or Flask imports — that's what makes them cheap to unit-test and safe to change independently of the pipeline around them.
+- **`cmd/<entrypoint>/main.py`** holds driving adapters only — wiring, not logic. An HTTP API and a batch CLI driving the same core are two real adapters, which is exactly what justifies that seam (see "one adapter = hypothetical seam, two = real") — neither should contain business logic the other would have to duplicate.
+- **`internal/logic/`** is the hexagon's interior. A deep module here has a narrow interface (e.g. `run_pipeline(client, period, overwrite)`) hiding extraction, transformation, external calls, and persistence — deleting it would move that complexity elsewhere, not remove it, which is the deletion test's signal to keep it.
+- **`internal/config.py`** is the one adapter between the process environment and everything else. Nothing outside it calls `os.environ.get(...)` directly.
+- **`internal/sql/`** (or `internal/store/`) is the driven-adapter side for data access: parameterized query templates, not strings built ad hoc in `internal/logic/`.
+- Keep pure helpers pure: formatting, truncation, and validation functions take plain data in and return plain data out, with no client or framework imports — that's what makes them cheap to unit-test.
 
 ### Go — same hexagonal convention
-No Go service has landed in this repo yet, but when one does, it follows the identical shape as Python, with Go's own compiler-enforced seam added on top:
-
-- **`cmd/<entrypoint>/main.go`** per driving adapter (HTTP server, worker, scheduler, CLI) — same role as `cmd/api/main.py` / `cmd/cli/main.py`, just compiled.
-- **`internal/`** holds everything not meant to be imported outside the module. Go enforces this at compile time — a free depth guarantee Python and TypeScript don't have, so lean on it instead of re-deriving access discipline by convention.
-- Package `internal/` by what a module *does* (`internal/logic`, `internal/store`, `internal/config`), not by technical layer (`internal/models`, `internal/handlers`, a catch-all `internal/services`) — same locality principle as the Python layout, just with Go package names instead of Python module names.
-- Define ports as small, consumer-defined interfaces at the point of use ("accept interfaces, return structs" — idiomatic Go), not a wide interface declared in the producer's package. `type InsightsStore interface { Save(ctx context.Context, i Insight) error }` is a seam; a twelve-method `Repository` interface is usually a shallow module wearing an interface as a costume.
-- The two-adapters rule applies unchanged: a real store and a fake store implementing the same port justify the interface. If only one concrete implementation will ever exist, keep the concrete type and skip the interface — an interface with one implementation is the hypothetical seam this skill's principles already warn against, Go or not.
+- **`cmd/<entrypoint>/main.go`** per driving adapter (HTTP server, worker, scheduler, CLI).
+- **`internal/`** holds everything not meant to be imported outside the module. Go enforces this at compile time — lean on it instead of re-deriving access discipline by convention.
+- Package `internal/` by what a module *does* (`internal/logic`, `internal/store`, `internal/config`), not by technical layer (`internal/models`, `internal/handlers`, a catch-all `internal/services`).
+- Define ports as small, consumer-defined interfaces at the point of use ("accept interfaces, return structs"). `type ReportStore interface { Save(ctx context.Context, r Report) error }` is a seam; a twelve-method `Repository` interface is usually a shallow module wearing an interface as a costume.
+- The two-adapters rule applies unchanged: if only one concrete implementation will ever exist, keep the concrete type and skip the interface.
 
 ### Frontend — split API logic from UI
-[`apps/feasibility-insights/ui/src/app/page.tsx`](../../../../apps/feasibility-insights/ui/src/app/page.tsx) currently calls `fetch()` directly inside the page component — API logic and UI logic sharing one module, the same shallow-seam problem as above, just in TypeScript. Treat this as the anti-pattern to avoid in new frontend work, not as the pattern to copy:
+Calling `fetch()` directly inside a page or component mixes API logic and UI logic in one module — the same shallow-seam problem, in TypeScript. Avoid it in new frontend work:
 
-- Give API calls their own module behind a narrow interface — one file per backend resource (e.g. `src/lib/api/insights.ts` exporting `generateInsights(params): Promise<InsightsResult>`), consumed from components via a hook (`useInsights()`) or an event handler. A raw `fetch(` inside a `.tsx` file is a smell on sight.
-- This buys two real adapters almost for free: the real `fetch`-backed implementation, and a fake/mock implementation for component tests — satisfying "one adapter = hypothetical seam, two = real" the moment a test is written against the interface instead of against `page.tsx`.
-- Pick one pattern (a thin `ApiClient` class, or plain exported functions per resource) and apply it consistently across the UI rather than inventing a new shape per page — consistency matters more than which pattern wins.
-- Shape API responses into domain terms inside the API module, not in JSX. A component's props are its interface, and that interface should already speak the vocabulary above (`InsightsResult`), not raw wire-format JSON.
+- Give API calls their own module behind a narrow interface — one file per backend resource (e.g. `src/lib/api/reports.ts` exporting `getReport(params): Promise<Report>`), consumed via a hook (`useReport()`) or an event handler. A raw `fetch(` inside a `.tsx` file is a smell on sight.
+- This yields two real adapters almost for free: the real `fetch`-backed implementation, and a fake for component tests.
+- Pick one pattern (a thin `ApiClient` class, or plain exported functions per resource) and apply it consistently.
+- Shape API responses into domain terms inside the API module, not in JSX. A component's props should already speak the domain vocabulary, not raw wire-format JSON.
 
 ### Testing
-[`engineering/testing`](../testing/SKILL.md) decides unit vs. integration vs. functional vs. e2e; this skill only adds the design angle on top: **depth determines what's worth testing.** A deep module's narrow interface is cheap to test thoroughly and stays valid across internal refactors. A shallow module resists good tests — tests end up asserting on implementation details — which is itself a signal to deepen the module, not to write more mocks.
+[`engineering/testing`](../testing/SKILL.md) decides unit vs. integration vs. functional vs. e2e; this skill adds the design angle: **depth determines what's worth testing.** A deep module's narrow interface is cheap to test thoroughly and stays valid across refactors. A shallow module resists good tests — a signal to deepen it, not to write more mocks.
 
-- **Python**: unit-test the pure functions in `internal/logic/` directly, with no mocking required, since they take plain data in and out. Integration-test `internal/sql/` queries against BigQuery rather than mocking the query string. Don't unit-test `internal/config.py` by mocking `os.environ` at every call site — it's a leaf adapter; trust it, or replace it wholesale in an integration test.
-- **Go**: table-driven tests (`[]struct{ name string; in X; want Y }`) are the idiomatic shape for single-purpose-function tests. `net/http/httptest` is the standard adapter-level fake for HTTP ports — reach for it before hand-rolling a mock server.
-- **Frontend**: once API logic is split out (see above), component tests exercise the UI through its props, not through fetch internals buried inside the component.
+- **Python**: unit-test pure functions in `internal/logic/` directly, no mocking. Integration-test data-access queries against a real test database/emulator rather than asserting on query strings. Don't unit-test the config adapter by mocking `os.environ` everywhere — trust it, or replace it wholesale in an integration test.
+- **Go**: table-driven tests (`[]struct{ name string; in X; want Y }`); `net/http/httptest` as the standard fake for HTTP ports.
+- **Frontend**: once API logic is split out, component tests exercise the UI through its props, not through fetch internals.
 
 ### Function design — single-purpose and clean
-One job per function, named for that job. `format_duration_human`, `truncate_to_complete_sentences`, and `safe_format_prompt` in `insights_engine.py` are the standard to hold new functions to: each does exactly what its name says, takes plain inputs, returns a plain output, and has no side effects.
+One job per function, named for that job: takes plain inputs, returns a plain output, no side effects where avoidable.
 
-- A function doing two things ("fetch and format," "validate and save") is a signal to split it at the "and" — the two halves usually have different test needs and different reasons to change.
-- The deletion test applies at function granularity too, not just module granularity: if inlining a function at its one call site would concentrate logic, it was pulling its weight; if it existed only to shorten a long function, inlining it back is fine.
+- A function doing two things ("fetch and format," "validate and save") is a signal to split it at the "and."
+- The deletion test applies at function granularity too: if inlining a function at its one call site would concentrate logic, it was pulling its weight; if it existed only to shorten a long function, inlining it back is fine.
 
 ### Logging
-Every service boundary — an API entrypoint, a CLI entrypoint, a background job — gets structured logging from the start, not bolted on during debugging.
+Every service boundary — API entrypoint, CLI entrypoint, background job — gets structured logging from the start.
 
-- This repo's existing convention, visible in both `cmd/api/main.py` and `internal/logic/insights_engine.py`: one `logger = logging.getLogger("<component-name>")` per module, configured once centrally (`logging.basicConfig` with timestamp, level, logger name, and `file:line`). Never bare `print()`.
-- Log at seams, not inside pure functions. `cmd/api/main.py`'s error handlers log every 400/404/500 with context before responding; `internal/logic` logs around the expensive or fallible steps (BigQuery extraction, Gemini generation) — not inside `format_duration_human`. A pure function that logs is no longer pure, and its presence there is a sign logging crept into the wrong layer.
-- **Go**: use the standard library `log/slog` for structured, key-value logging instead of formatted strings, so log lines stay queryable.
-- Never log a request/response payload wholesale in production. Log identifiers (`client_name`, a request id) and outcomes — not raw PII or full prompt/response bodies.
+- **Python**: one `logger = logging.getLogger("<component-name>")` per module, configured once centrally (timestamp, level, logger name, `file:line`). Never bare `print()`.
+- **Go**: standard library `log/slog` for structured key-value logging.
+- Log at seams, not inside pure functions: entrypoints log errors with context before responding; core logic logs around expensive or fallible steps (external calls, queries). A pure function that logs is no longer pure.
+- Never log request/response payloads wholesale in production. Log identifiers and outcomes — not PII or full prompt/response bodies.
 
 ## Using this vocabulary in review
 - Name the module's depth before proposing a change to it — shallow modules get collapsed or absorbed, deep modules get protected.

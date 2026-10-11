@@ -20,5 +20,5 @@ Use at the start of Step 1 — after Step 0 planning (`productivity/plan`) has d
 5. **Present & gate** — once resources are confirmed sufficient, wait for explicit human confirmation before `processing/` work begins. Never auto-advance.
 
 ## Notes
-- This skill never writes to `apps/[workspace]`.
+- This skill never writes to production code.
 - If no Step 0 planning exists yet for this ask, say so and offer to run `productivity/plan` first rather than guessing what belongs here.
