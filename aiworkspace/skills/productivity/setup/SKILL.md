@@ -35,5 +35,5 @@ Tell the user up front what the steps are and that each optional one can be skip
 10. **Present & gate** — show everything written (`host.md`, `project.md`, `codebase-map.md`, `brand/`, `soul.md`, the new workspace) and anything skipped. Wait for explicit confirmation before any `/plan` work begins.
 
 ## Notes
-- Getting the harness files into the repo is a separate step: a manual copy for now (see the planned installer in the root `README.md` roadmap).
+- Getting the harness files into the repo is a separate step: `python tools/install.py <repo>` from a harness checkout (see the harness `README.md`). It creates `host.md` with `host_mode: unset`, which is what triggers this skill.
 - This skill and the skills it delegates to write only inside `aiworkspace/`, plus the agent-instruction merge in step 7 with the user's approval. Never write to `apps/` or other production code from here.

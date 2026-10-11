@@ -18,13 +18,17 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
 
 ## Install
 
-> Automated install is planned (see the roadmap below). For now it is a manual copy.
+Requires Python 3.8+ (standard library only). From a checkout of this repository:
 
-1. Copy into the root of the target repository:
-   - `aiworkspace/`
-   - `AGENTS.md`
-   - `CLAUDE.md` *(if the repo already has one, append a pointer to `AGENTS.md` instead of overwriting it)*
-   - `.claude/skills/` *(Claude Code only: the slash-command adapters; merge alongside any skills the repo already has)*
+```bash
+python tools/install.py path/to/your-repo --dry-run   # preview
+python tools/install.py path/to/your-repo             # install
+```
+
+1. The installer writes:
+   - `aiworkspace/`: skills, the workspace template, and starter `host.md`/`project.md`/`index.md`
+   - `.claude/skills/`: Claude Code slash-command adapters. Skills already in your repo are kept; a name clash is reported, not overwritten.
+   - `AGENTS.md` and `CLAUDE.md`: the harness rules go inside a `<!-- aiworkspace:start -->` … `<!-- aiworkspace:end -->` block. An existing file keeps its own content, and the block is appended below it.
 2. Open the repo in your agent and run **`/setup`** (or ask it to "set up aiworkspace"). Setup will:
    - detect your stack and propose a `host_mode`,
    - write `aiworkspace/host.md` and `aiworkspace/project.md`,
@@ -32,6 +36,16 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
    - onboard your brand, its files, and your UI stack into `aiworkspace/brand/`, or use the neutral template defaults,
    - create `aiworkspace/soul.md`, a persona so agents speak and code *as your project*,
    - create and define your first workspace via `/define`.
+
+### Upgrading
+
+Pull the latest harness and run the same command again. `aiworkspace/.harness-manifest.json` records every file the installer wrote, along with its hash, so an upgrade:
+- updates or removes harness files you haven't touched;
+- reports harness files you **edited** as conflicts and leaves them alone (re-run with `--force` to overwrite);
+- replaces only the marked block in `AGENTS.md`/`CLAUDE.md`;
+- never touches your project files: `host.md`, `project.md`, `index.md`, workspaces, `brand/`, `codebase-map.md`, `soul.md`.
+
+The installer exits with `1` when there are conflicts, and with `2` on errors (e.g. stale adapters in the harness checkout).
 
 ### Host modes
 
@@ -95,7 +109,7 @@ The "Slash Commands & Aliases" table in [`aiworkspace/README.md`](./aiworkspace/
 ```bash
 python tools/gen_claude_adapters.py          # regenerate after editing the table or a skill description
 python tools/gen_claude_adapters.py --check  # exit 1 if adapters are out of date (use in CI)
-python -m unittest discover tools            # generator tests
+python -m unittest discover tools            # generator + installer tests
 ```
 
 Adapter behavior:
@@ -105,5 +119,4 @@ Adapter behavior:
 
 ## Roadmap
 
-- [ ] Installer (`npx degit` / install script) that copies the harness and merges into an existing `CLAUDE.md`/`AGENTS.md` without overwriting
 - [ ] Link checker and "no leftover project names" check for the harness itself
