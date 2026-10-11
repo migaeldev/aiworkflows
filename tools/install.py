@@ -6,7 +6,8 @@ Run from a checkout of the harness:
     python tools/install.py <target-repo> --force     # also overwrite files you edited locally
 
 What gets written:
-- Core files (skills, workspace template, aiworkspace/README.md, Claude Code adapters) are
+- Core files (skills, specialist agents, workspace template, aiworkspace/README.md, Claude Code
+  adapters) are
   copied and tracked by hash in aiworkspace/.harness-manifest.json. On upgrade, untouched core
   files are updated or removed. Files you edited locally are reported as conflicts and left
   alone unless --force.
@@ -31,7 +32,7 @@ BLOCK_START = "<!-- aiworkspace:start (managed by the aiworkspace installer; edi
 BLOCK_END = "<!-- aiworkspace:end -->"
 _BLOCK_START_PREFIX = "<!-- aiworkspace:start"
 
-CORE_DIRS = ["aiworkspace/skills", "aiworkspace/scripts", "aiworkspace/workspaces/template-workspace"]
+CORE_DIRS = ["aiworkspace/skills", "aiworkspace/agents", "aiworkspace/scripts", "aiworkspace/workspaces/template-workspace"]
 CORE_FILES = ["aiworkspace/README.md"]
 INSTANCE_FILES = ["aiworkspace/host.md", "aiworkspace/project.md", "aiworkspace/index.md"]
 BLOCK_FILES = ["AGENTS.md", "CLAUDE.md"]

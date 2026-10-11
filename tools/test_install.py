@@ -41,6 +41,7 @@ class FreshInstallTest(InstallTestCase):
                     "aiworkspace/host.md", "aiworkspace/project.md", "aiworkspace/index.md",
                     ".claude/skills/plan/SKILL.md", ".claude/skills/spec/SKILL.md",
                     "aiworkspace/scripts/agent_pointers.py",
+                    "aiworkspace/agents/README.md", "aiworkspace/agents/code-reviewer/AGENT.md",
                     install.MANIFEST):
             self.assertTrue((self.target / rel).exists(), rel)
         self.assertIn("host_mode: unset", self.read("aiworkspace/host.md"))
