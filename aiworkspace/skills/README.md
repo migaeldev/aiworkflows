@@ -47,16 +47,16 @@ aiworkspace/skills/
     ├── README.md                      # Productivity Skills Index
     ├── caveman/                       # Concise token-saving response mode
     ├── context-management/            # Context/session memory management
-    ├── finalize/                      # Step 3 gates + dual-axis review
+    ├── define/                        # Step 0 workspace creation & core definition (/define, /spec)
+    ├── finalize/                      # Step 4 gates + dual-axis review
     ├── goal-driven/                   # Declarative success-criteria workflow
     ├── grill-me/                      # Interactive requirement grilling
     ├── handoff/                       # Structured session context summary
-    ├── new-workspace/                 # Domain workspace scaffolding
     ├── persona/                       # soul.md persona, project or workspace (/persona)
-    ├── plan/                          # Step 0 planning (Project Plan / Feature-Change Plan)
-    ├── process/                       # Step 2 iteration (re-invocable)
-    ├── promote/                       # Step 4 human-authorized deployment
-    ├── resources/                     # Step 1 input-context catalog/request
+    ├── plan/                          # Step 1 feature plans & task lists
+    ├── process/                       # Step 3 iteration through the task list (re-invocable)
+    ├── promote/                       # Step 5 human-authorized deployment
+    ├── resources/                     # Step 2 input-context catalog/request
     ├── setup/                         # One-time repo onboarding (host_mode)
     └── write-a-skill/                 # Standardized OKF skill authoring tool
 ```
@@ -89,15 +89,15 @@ aiworkspace/skills/
 | **🛡️ Security** | `sql-injection-audit` | SQL & Query Injection Audit | Parameterized query verification & SQL injection audit. | [`security/sql-injection-audit/SKILL.md`](./security/sql-injection-audit/SKILL.md) |
 | **⚡ Productivity** | `caveman` | Caveman Token Saver | Concise, high-density token-saving responses. | [`productivity/caveman/SKILL.md`](./productivity/caveman/SKILL.md) |
 | **⚡ Productivity** | `context-management` | Context Management | Manage AI agent context and session memory during long/multi-step sessions. | [`productivity/context-management/SKILL.md`](./productivity/context-management/SKILL.md) |
-| **⚡ Productivity** | `finalize` | Finalize (Step 3) | Applicable verification gates + dual-axis `code-review`, then move to `finalized/`. | [`productivity/finalize/SKILL.md`](./productivity/finalize/SKILL.md) |
+| **⚡ Productivity** | `define` | Define (Step 0) | Create/redefine a workspace and define its core in `definition.md` (`/define`, `/spec`). | [`productivity/define/SKILL.md`](./productivity/define/SKILL.md) |
+| **⚡ Productivity** | `finalize` | Finalize (Step 4) | Applicable verification gates + dual-axis `code-review`, then move to `finalized/`. | [`productivity/finalize/SKILL.md`](./productivity/finalize/SKILL.md) |
 | **⚡ Productivity** | `goal-driven` | Goal-Driven Development | Declarative success criteria instead of step-by-step instructions. | [`productivity/goal-driven/SKILL.md`](./productivity/goal-driven/SKILL.md) |
 | **⚡ Productivity** | `grill-me` | Interactive Requirement Grilling | Requirement clarification & edge-case stress testing. | [`productivity/grill-me/SKILL.md`](./productivity/grill-me/SKILL.md) |
 | **⚡ Productivity** | `handoff` | Session Handoff Summary | Session state serialization & context preservation. | [`productivity/handoff/SKILL.md`](./productivity/handoff/SKILL.md) |
-| **⚡ Productivity** | `new-workspace` | New Workspace | Scaffold a new domain workspace from the template, then define its scope via `plan` (Project Plan mode). | [`productivity/new-workspace/SKILL.md`](./productivity/new-workspace/SKILL.md) |
 | **⚡ Productivity** | `persona` | Persona (soul.md) | Create/change the project or workspace persona the agent adopts (`/persona`). | [`productivity/persona/SKILL.md`](./productivity/persona/SKILL.md) |
-| **⚡ Productivity** | `plan` | Plan (Step 0) | Project Plan vs. Feature/Change Plan, grill-me always, goal-driven only if opted in, before `resources/` work begins. | [`productivity/plan/SKILL.md`](./productivity/plan/SKILL.md) |
-| **⚡ Productivity** | `process` | Process (Step 2) | One re-invocable round of `processing/` iteration; loads `software-engineer` for code. | [`productivity/process/SKILL.md`](./productivity/process/SKILL.md) |
-| **⚡ Productivity** | `promote` | Promote (Step 4) | Human-authorized deployment of audited `finalized/` content to production. | [`productivity/promote/SKILL.md`](./productivity/promote/SKILL.md) |
-| **⚡ Productivity** | `resources` | Resources (Step 1) | Catalog/request input context, schemas & raw data per the Step 0 plan. | [`productivity/resources/SKILL.md`](./productivity/resources/SKILL.md) |
+| **⚡ Productivity** | `plan` | Plan (Step 1) | Feature/change plan with ordered tasks & resources needed; defines the workspace first if missing. | [`productivity/plan/SKILL.md`](./productivity/plan/SKILL.md) |
+| **⚡ Productivity** | `process` | Process (Step 3) | One re-invocable round of `processing/` iteration; loads `software-engineer` for code. | [`productivity/process/SKILL.md`](./productivity/process/SKILL.md) |
+| **⚡ Productivity** | `promote` | Promote (Step 5) | Human-authorized deployment of audited `finalized/` content to production. | [`productivity/promote/SKILL.md`](./productivity/promote/SKILL.md) |
+| **⚡ Productivity** | `resources` | Resources (Step 2) | Catalog/request input context, schemas & raw data per the plan's Resources Needed. | [`productivity/resources/SKILL.md`](./productivity/resources/SKILL.md) |
 | **⚡ Productivity** | `setup` | Setup (Repository Onboarding) | One-time bootstrap — host mode, conventions, codebase map, brand, persona, first workspace. | [`productivity/setup/SKILL.md`](./productivity/setup/SKILL.md) |
 | **⚡ Productivity** | `write-a-skill` | OKF Skill Authoring | Creating new standardized OKF skills (`type: skill`). | [`productivity/write-a-skill/SKILL.md`](./productivity/write-a-skill/SKILL.md) |

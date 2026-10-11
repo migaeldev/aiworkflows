@@ -1,19 +1,19 @@
 ---
 type: skill
 name: finalize
-title: Finalize (Step 3)
+title: Finalize (Step 4)
 description: Run every applicable verification gate plus the dual-axis code-review, then move passing content from processing/ to finalized/. Use when the human explicitly asks to finalize, approve, or audit the current processing/ work.
-tags: [skill, productivity, lifecycle, step-3]
+tags: [skill, productivity, lifecycle, step-4]
 timestamp: 2026-10-04T00:00:00+02:00
 ---
 
-# Finalize (Step 3)
+# Finalize (Step 4)
 
 ## Trigger
 Use only when explicitly requested by the human, after they've approved the current `processing/` work. Never self-trigger — `AGENTS.md` Directive #7 requires explicit human instruction for this transition.
 
 ## Process
-1. **Run every applicable gate** (`AGENTS.md` Step 3). For each gate, log `PASS`, `FAIL`, or `N/A — <reason>` in `log.md`; never skip one silently:
+1. **Run every applicable gate** (`AGENTS.md` Step 4). For each gate, log `PASS`, `FAIL`, or `N/A — <reason>` in `log.md`; never skip one silently:
    1. Security Audit *(always)* — run the relevant `security/` skills, log findings.
    2. API Specification *(only if an HTTP/REST API is exposed or changed)* — generate/update an OpenAPI 3.x spec.
    3. Production-Ready Documentation *(always)* — READMEs, plus architecture/deployment notes where warranted.

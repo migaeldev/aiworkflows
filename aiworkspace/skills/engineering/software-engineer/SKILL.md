@@ -21,7 +21,7 @@ This skill's mandates apply only to *code-writing* work. A domain workspace doin
 ## Mandated behaviors
 
 0. **Write like the project.** Before writing code, read `aiworkspace/codebase-map.md` (where the change belongs, which existing pattern to copy) and the effective `soul.md` persona, and follow the comment policy in `aiworkspace/project.md`. New code should be indistinguishable in style from the code around it.
-1. **Plan first.** If this unit of work hasn't already been through Step 0, run `productivity/plan` before writing code — either a Feature/Change Plan for this specific ask, or confirm an existing Project Plan already covers it.
+1. **Plan first.** If this unit of work has no `planning/features/<slug>/plan.md` yet, run `productivity/plan` before writing code. It defines the workspace first if needed. Work through the plan's tasks in order.
 2. **Pick the test type(s).** Use [`engineering/testing`](../testing/SKILL.md)'s router to decide unit / integration / functional / e2e for this change, then run [`engineering/test-first`](../test-first/SKILL.md)'s red-green-refactor loop for each.
 3. **Review on two axes before calling it done.** Run [`engineering/code-review`](../code-review/SKILL.md)'s dual-axis pass — Standards *and* Spec Fidelity — before considering the work finished, not just before merge.
 4. **Keep `index.md` current.** When new domain terminology, constraints, or decisions surface mid-task, write them into the domain's `index.md` Domain Identity/Directives section immediately. That file is the glossary — there is no separate one to update later.
@@ -30,7 +30,7 @@ This skill's mandates apply only to *code-writing* work. A domain workspace doin
 
 ## Quick checklist
 - [ ] Codebase map, persona & comment policy consulted; style matches surrounding code
-- [ ] Plan exists for this unit of work (Project or Feature/Change)
+- [ ] Workspace defined and a feature plan exists for this unit of work
 - [ ] Test type(s) decided, test-first loop followed
 - [ ] Dual-axis code-review run (Standards + Spec Fidelity)
 - [ ] `index.md` updated if new terminology/decisions surfaced

@@ -51,7 +51,7 @@ It is project-agnostic. Everything specific to *this* repository lives in files 
    - **`monorepo` mode — No Direct AI Edits to Production (`apps/`)**: No AI model or assistant may modify, create, or delete any files inside `apps/[workspace]` directly unless a human explicitly requests the `promote` step.
    - **`bolt-on` mode — No Direct AI Edits Outside `aiworkspace/`**: Everything in the repository outside `aiworkspace/` (and agent-tool folders such as `.claude/`) is READ-ONLY for AI except via an explicit `promote` that writes only to the paths recorded in that workspace's `index.md` Production Target Map. `promote` MUST refuse to guess a destination for any `finalized/` file with no map entry — ask instead.
    - **Processing Stage Mandatory (both modes)**: All code generation, feature additions, refactoring, and bug fixes MUST take place inside `aiworkspace/workspaces/[workspace]/processing/`.
-   - **Copy-First Workflow (both modes)**: If existing production code needs changes, first copy it into `aiworkspace/workspaces/[workspace]/processing/`, perform and test all modifications there, obtain human approval, pass the Step 3 gates to move to `finalized/`, and wait for an explicit human `promote` command.
+   - **Copy-First Workflow (both modes)**: If existing production code needs changes, first copy it into `aiworkspace/workspaces/[workspace]/processing/`, perform and test all modifications there, obtain human approval, pass the Step 4 gates to move to `finalized/`, and wait for an explicit human `promote` command.
    - **Standalone Production README Rule (`monorepo` mode)**: During `promote`, `apps/[workspace]/README.md` MUST be a standalone guide: developer setup, environment variable documentation, and the `.env.template` content (if the app has one) embedded inline as a copyable code block.
    - **Root README Entry Update Rule (`monorepo` mode)**: During `promote`, also update the root `README.md` to add or update the application entry.
 
@@ -64,7 +64,7 @@ It is project-agnostic. Everything specific to *this* repository lives in files 
    - **Equivalent Force**: This applies regardless of whether the skill would otherwise surface via normal registry discovery.
 
 9. **UNIVERSAL SLASH-COMMAND DIRECTIVE (VENDOR-NEUTRAL, ALL AGENTS)**:
-   - **Any agent, native slash support or not**: `/setup`, `/new-workspace`, `/map`, `/brand`, `/persona`, `/plan`, `/resources`, `/process`, `/finalize`, `/promote` — and their aliases (canonical list in [`aiworkspace/README.md`](./aiworkspace/README.md)'s "Slash Commands & Aliases" table) — MUST be treated as a request to run the matching `aiworkspace/skills/productivity/<name>/SKILL.md`, regardless of whether the tool has its own slash-command system.
+   - **Any agent, native slash support or not**: `/setup`, `/map`, `/brand`, `/persona`, `/define`, `/plan`, `/resources`, `/process`, `/finalize`, `/promote` — and their aliases (canonical list in [`aiworkspace/README.md`](./aiworkspace/README.md)'s "Slash Commands & Aliases" table) — MUST be treated as a request to run the skill that table maps them to, regardless of whether the tool has its own slash-command system.
    - **Layered, not exclusive**: Tool-specific adapters (e.g. `.claude/skills/<name>/SKILL.md` in Claude Code) may additionally surface these as native commands — that layer is additive, never a replacement.
    - **Natural language still works**: A plain-language request to "move to processing" or "run the finalize gates" invokes the identical skill.
 
@@ -72,7 +72,7 @@ It is project-agnostic. Everything specific to *this* repository lives in files 
 
 ## 🧩 Entry Point & Knowledge Architecture
 
-The harness uses **Google's Open Knowledge Format (OKF v0.1)** under `aiworkspace/`, coupled with a **5-Step Lifecycle Pipeline** and an **Integrated Skills Registry**.
+The harness uses **Google's Open Knowledge Format (OKF v0.1)** under `aiworkspace/`, coupled with a **6-Step Lifecycle Pipeline** and an **Integrated Skills Registry**.
 
 Before performing code generation, refactoring, or query tasks, agents MUST consult:
 1. **Install & Conventions**: [`aiworkspace/host.md`](./aiworkspace/host.md) and [`aiworkspace/project.md`](./aiworkspace/project.md)
@@ -90,49 +90,55 @@ If the task's workspace is ambiguous (several are listed in `index.md`), ask whi
 - Agents have access to specialized skills in [`aiworkspace/skills/`](./aiworkspace/skills/README.md):
   - **Design**: [`design/README.md`](./aiworkspace/skills/design/README.md) (`brand-guidelines`, `brand-onboarding` — Directive #4)
   - **Engineering**: [`engineering/README.md`](./aiworkspace/skills/engineering/README.md) (`software-engineer` — mandatory, Directive #8 — plus `codebase-map`, `code-review`, `testing`, `diagnose`, `frontend-design`, …)
-  - **Productivity**: [`productivity/README.md`](./aiworkspace/skills/productivity/README.md) (`plan`, `resources`, `process`, `finalize`, `promote` — the lifecycle, Directive #9 — plus `setup`, `new-workspace`, `persona`, `grill-me`, `goal-driven`, `handoff`, …)
+  - **Productivity**: [`productivity/README.md`](./aiworkspace/skills/productivity/README.md) (`define`, `plan`, `resources`, `process`, `finalize`, `promote` — the lifecycle, Directive #9 — plus `setup`, `persona`, `grill-me`, `goal-driven`, `handoff`, …)
   - **Security**: [`security/README.md`](./aiworkspace/skills/security/README.md) (`security-code-audit`, `ci-cd-security-review`, …)
 - When a task requires a specialized workflow, consult the matching skill's `SKILL.md` and follow its instructions.
 
 ---
 
-## 🔄 The 5-Step Agent Workflow
+## 🔄 The 6-Step Agent Workflow
 
 Every domain workspace (`aiworkspace/workspaces/<domain>/`) follows:
 
 ```text
-[Step 0: planning/] ──> [Step 1: resources/] ──> [Step 2: processing/] ──> [Step 3: finalized/] ──> [Step 4: promote] ──> [production]
- (Plan & Research)        (Input Context)          (Active Iteration)        (Audited Gates & Code)     (Human Deployment)    (apps/<workspace>/ or Target Map)
+[0: define] ──> [1: plan] ──> [2: resources/] ──> [3: processing/] ──> [4: finalized/] ──> [5: promote] ──> [production]
+ workspace core   feature/tasks   input context      active iteration     audited & gated     human-only      apps/<workspace>/ or Target Map
+ definition.md    planning/
 ```
 
 > [!IMPORTANT]
 > **MANDATORY STEP GATE**: AI agents MUST NOT automatically advance to the next step. Each step transition requires explicit human confirmation.
 
-### Step 0: Planning (`planning/`)
-- Run [`productivity/plan`](./aiworkspace/skills/productivity/plan/SKILL.md) before populating `resources/` for a new ask.
-- Determines **Project Plan** (whole workspace, rare) vs. **Feature/Change Plan** (one unit of work, frequent). Always runs `grill-me`; offers `goal-driven` as an opt-in.
-- **CRITICAL**: Do not advance to `resources/` until the plan is presented and the human confirms (Directive #7).
+### Step 0: Define (`definition.md`)
+- Run [`productivity/define`](./aiworkspace/skills/productivity/define/SKILL.md) (`/define`, `/spec`) to create a workspace and define its core: purpose, scope, users, success criteria, directives, production target, known unknowns, and candidate features.
+- Done once per workspace and revised rarely (redefine mode). Always runs `grill-me`; offers `goal-driven` as an opt-in.
+- **CRITICAL**: No feature planning in a workspace until its definition is presented and the human confirms it (Directive #7).
 
-### Step 1: Input & Resources (`resources/`)
-- Inspect all files under `aiworkspace/workspaces/<domain>/resources/`.
+### Step 1: Plan (`planning/`)
+- Run [`productivity/plan`](./aiworkspace/skills/productivity/plan/SKILL.md) (`/plan`) for each feature, change, or batch of work. It writes `planning/features/<slug>/plan.md` with decisions, an ordered **task list**, the **resources needed**, and the testing approach.
+- **If the target workspace doesn't exist or isn't defined, `plan` hands off to `define` first.** Asks that fall outside the workspace's defined scope are flagged, never quietly absorbed.
+- **CRITICAL**: Do not advance to `resources/` until the plan is presented and the human confirms.
+
+### Step 2: Input & Resources (`resources/`)
+- Gather what the plan's **Resources Needed** section lists into `aiworkspace/workspaces/<domain>/resources/`.
 - **CRITICAL**: If `resources/` is empty or lacks the required context, **apply Directive #1 and ask the user** before proceeding.
 
-### Step 2: Generation & Human Validation (`processing/`)
-- Write all generated content, draft specs, and code into `aiworkspace/workspaces/<domain>/processing/`.
+### Step 3: Generation & Human Validation (`processing/`)
+- Work through the plan's tasks, writing all generated content, draft specs, and code into `aiworkspace/workspaces/<domain>/processing/`, and ticking tasks off in `plan.md`.
 - Iterate based on human feedback inside `processing/`.
-- **STOP & WAIT**: Do NOT move files to `finalized/` until the human explicitly asks for Step 3.
+- **STOP & WAIT**: Do NOT move files to `finalized/` until the human explicitly asks for Step 4.
 
-### Step 3: Audit, Verification Gates & Finalization (`finalized/`)
-- **Trigger**: ONLY when explicitly requested by the human after approving Step 2 work.
+### Step 4: Audit, Verification Gates & Finalization (`finalized/`)
+- **Trigger**: ONLY when explicitly requested by the human after approving Step 3 work.
 - Content moves from `processing/` to `finalized/` ONLY AFTER passing **every applicable gate**. A gate that does not apply is recorded as `N/A` with a one-line reason in `log.md` — never silently skipped:
   1. **🛡️ Security Audit** *(always)*: Run the relevant security skills and log findings in `log.md`.
   2. **📖 API Specification** *(if the work exposes or changes an HTTP/REST API)*: Generate or update an OpenAPI 3.x spec (`openapi.json`/`openapi.yaml`).
   3. **📄 Production-Ready Documentation** *(always)*: READMEs and, where the change warrants them, architecture diagrams and deployment notes.
   4. **🧪 Verification & Tests** *(always)*: Run the project's build/lint/test commands from `project.md`. If the project has no test suite, say so and record what verification was done instead.
-- Plus the dual-axis [`engineering/code-review`](./aiworkspace/skills/engineering/code-review/SKILL.md), persisted to `finalized/review.md`.
-- **STOP & WAIT**: Do NOT proceed to Step 4 until the human explicitly requests it.
+- Plus the dual-axis [`engineering/code-review`](./aiworkspace/skills/engineering/code-review/SKILL.md) against the plan and the workspace definition, persisted to `finalized/review.md`.
+- **STOP & WAIT**: Do NOT proceed to Step 5 until the human explicitly requests it.
 
-### Step 4: Promote & Production Deployment
+### Step 5: Promote & Production Deployment
 - **Trigger**: ONLY when explicitly requested by the human. Run [`productivity/promote`](./aiworkspace/skills/productivity/promote/SKILL.md).
 - **`monorepo`**: copies `finalized/` into `apps/<workspace>/`, writes its standalone README, and updates the root `README.md`.
 - **`bolt-on`**: copies each `finalized/` file to its destination in the workspace's Production Target Map; unmapped files stop the promote.

@@ -2,7 +2,7 @@
 type: skill
 name: setup
 title: Setup (Repository Onboarding)
-description: One-time bootstrap after the aiworkspace harness files are copied into a repository — detect the stack, record host_mode and project conventions, map the codebase (with permission), onboard the brand (or use template defaults), create the project persona (soul.md), then scaffold the first workspace via new-workspace. Use when aiworkspace/host.md reads host_mode unset, or the user asks to set up/onboard aiworkspace here.
+description: One-time bootstrap after the aiworkspace harness files are copied into a repository — detect the stack, record host_mode and project conventions, map the codebase (with permission), onboard the brand (or use template defaults), create the project persona (soul.md), then create and define the first workspace via define. Use when aiworkspace/host.md reads host_mode unset, or the user asks to set up/onboard aiworkspace here.
 tags: [skill, productivity, setup, onboarding, host-mode]
 timestamp: 2026-10-11T00:00:00+02:00
 ---
@@ -31,8 +31,8 @@ Tell the user up front what the steps are and that each optional one can be skip
 6. **Project persona** — run [`productivity/persona`](../persona/SKILL.md) at **project** scope to create `aiworkspace/soul.md`. It's built from the codebase map, `project.md`, and `brand/brand.md`, with grill-me filling the gaps. If the user skips it, set **Persona** in `project.md` to `declined`.
 7. **Merge agent instructions** — if the repo already had its own `CLAUDE.md`/`AGENTS.md` before the harness was copied in, make sure it points at the harness `AGENTS.md` rather than being overwritten, and that the two don't contradict each other. Surface any conflicts to the user, and only edit those files with their approval.
 8. **Workspaces interview** — invoke [`productivity/grill-me`](../grill-me/SKILL.md) to learn whether one or several domain workspaces are expected now. **In `bolt-on` mode**, also learn where different kinds of production code should land. The codebase map's Change Recipes and Module Map make good proposals. This seeds the first workspace's Production Target Map.
-9. **Scaffold the first workspace by delegating to [`productivity/new-workspace`](../new-workspace/SKILL.md)**. Don't duplicate its logic here.
-10. **Present & gate** — show everything written (`host.md`, `project.md`, `codebase-map.md`, `brand/`, `soul.md`, the new workspace) and anything skipped. Wait for explicit confirmation before any Step 0/1 work begins.
+9. **Create and define the first workspace by delegating to [`productivity/define`](../define/SKILL.md)** (Step 0). Don't duplicate its logic here.
+10. **Present & gate** — show everything written (`host.md`, `project.md`, `codebase-map.md`, `brand/`, `soul.md`, the new workspace) and anything skipped. Wait for explicit confirmation before any `/plan` work begins.
 
 ## Notes
 - Getting the harness files into the repo is a separate step: a manual copy for now (see the planned installer in the root `README.md` roadmap).

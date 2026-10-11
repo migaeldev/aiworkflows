@@ -1,44 +1,73 @@
 ---
 type: skill
 name: plan
-title: Plan (Step 0)
-description: Step 0 of the lifecycle — determine whether this is a Project Plan or a Feature/Change Plan, interview with grill-me, optionally frame with goal-driven, research where needed, and write the plan before resources/ work begins. Use when starting new work in a workspace, before writing to resources/ or processing/.
-tags: [skill, productivity, planning, step-0, grill-me, goal-driven]
-timestamp: 2026-10-04T00:00:00+02:00
+title: Plan (Step 1)
+description: Step 1 of the lifecycle — plan a feature, change, or batch of work inside a defined workspace, covering problem, solution, decisions, an ordered task list, the resources needed, and the testing approach, via a grill-me interview. If the target workspace doesn't exist or isn't defined yet, hand off to productivity/define first. Use for /plan, or when starting any new unit of work, before resources/ or processing/.
+tags: [skill, productivity, planning, step-1, tasks, grill-me, goal-driven]
+timestamp: 2026-10-11T00:00:00+02:00
 ---
 
-# Plan (Step 0)
+# Plan (Step 1)
 
 ## Trigger
-Use at the start of any new unit of work in a domain workspace — before `resources/` is populated for a new ask, and before any `processing/` work begins. This is Step 0 of the lifecycle, upstream of `resources/`.
-
-## Two plan types
-Determine which applies before doing anything else — confirm with the user rather than assuming (Directive #1):
-
-| | Project Plan | Feature/Change Plan |
-|---|---|---|
-| Scope | Whole workspace/domain | One feature, fix, or unit of work |
-| Cadence | Once at workspace inception; rarely revised | Every time this skill runs for a new ask |
-| Output | `planning/project-plan.md` | `planning/features/<slug>/spec.md` |
-| Trigger | `productivity/new-workspace` delegates here | Any planning request once a project plan already exists |
-
-If `planning/project-plan.md` doesn't exist yet, this is a Project Plan. If it exists, default to Feature/Change Plan and ask the user to name the feature/slug.
+`/plan` (aliases `/step1`, `/research`), or the start of any new unit of work: a feature, fix, change, or batch of tasks. Planning comes before `resources/` is gathered for the ask and before any `processing/` work.
 
 ## Process
 
-1. **Determine plan type** — per the table above, confirming rather than assuming.
-2. **Ask about `goal-driven`** — before interviewing, ask: *"Want to frame this with `productivity/goal-driven` (success criteria / constraints / verification / out of scope) first? Recommended, but optional."* Only load it if the user says yes. Never auto-load it.
-3. **Interview** — invoke [`productivity/grill-me`](../grill-me/SKILL.md) one-question-at-a-time, every time, regardless of the answer to step 2. If `goal-driven` was loaded, use its template to shape the plan's `## Goal` section.
-4. **Research where needed** — for changes to host code, start with `aiworkspace/codebase-map.md` (if present) so the plan names the right modules and follows existing patterns. Otherwise, if a question can be answered by exploring the codebase or external sources, do that instead of asking. Record findings in `planning/research.md` with citations (Directive #2 — never hallucinate).
-5. **Write the plan**:
-   - **Project Plan** sections: `## Goal` (optional, only if step 2 was yes) → Domain Purpose & Identity → Success Criteria → Constraints & Directives → Known Unknowns.
-   - **Feature/Change Plan** sections: `## Goal` (optional) → Problem Statement → Solution → User Stories → Implementation Decisions → Testing Decisions → Out of Scope → Further Notes.
-6. **Enrich `index.md`** — write any new domain terminology, constraints, or purpose details straight into the domain's `index.md` Domain Identity/Directives section now. That file is the glossary — there's no separate one. If the interview shows this workspace needs a different voice or code style from the project soul, offer to run [`productivity/persona`](../persona/SKILL.md) at workspace scope rather than writing persona details into `index.md`.
-7. **Decision map for large work only** — if the ask doesn't collapse into one plan document, add `planning/decisions/<slug>.md` files instead (or alongside): OKF `type: resource`, each with `status: open | blocked | resolved` and `blocked_by: [...]` referencing other decision files. Unblocked + open files are the actionable frontier.
-8. **Log it** — append an entry to the domain's `log.md` recording what kind of plan was written, for what ask, and where the plan document landed.
-9. **Present & gate** — present the plan document (and any `index.md`/`log.md` changes) and wait for explicit human confirmation before `resources/` work begins (Project Plan) or `processing/` work begins on that feature (Feature/Change Plan). Never auto-advance.
+### 1. Resolve the workspace — define first if needed
+Work out which workspace the ask belongs to, from what the user said, the current context, and `aiworkspace/index.md`:
+
+| Situation | Action |
+| :--- | :--- |
+| No workspaces exist yet | Say so and hand off to [`productivity/define`](../define/SKILL.md), passing the ask along. Resume here after define's gate. |
+| The user named a workspace that doesn't exist | Same: hand off to `define` to create it. |
+| The workspace exists, but `definition.md` is missing or still the template placeholder | Hand off to `define` to define its core. |
+| The ask doesn't fit any existing workspace's scope | Ask: should it go in an existing workspace (which one), or a new one (→ `define`)? |
+| One clear match | Confirm it in one line and continue. |
+
+Never plan inside a workspace that hasn't been defined. Its definition is what the plan gets checked against.
+
+### 2. Load context
+Read the workspace's `definition.md` and `index.md` (directives, glossary). Then read `aiworkspace/codebase-map.md` (where this kind of change goes and which pattern to copy), the effective `soul.md` persona, and `aiworkspace/project.md`. Skim existing `planning/features/*/plan.md` for overlap or dependencies.
+
+### 3. Check scope against the definition
+If the ask falls outside the workspace's defined scope or breaks one of its directives, stop and say so. Offer two ways forward: revise the definition (`/define`, redefine mode) or plan it elsewhere. Don't quietly stretch the scope.
+
+### 4. Name the feature
+Agree on a short kebab-case slug (e.g. `csv-export`). Check that `planning/features/<slug>/` doesn't already exist. If it does, this is a revision of that plan, so edit it in place.
+
+### 5. Offer `goal-driven`
+Ask: *"Want to frame this with `productivity/goal-driven` (success criteria / constraints / verification / out of scope) first? Recommended, but optional."* Only load it if the user says yes.
+
+### 6. Interview with grill-me
+Invoke [`productivity/grill-me`](../grill-me/SKILL.md): one question at a time, each with your recommended answer. Where the codebase or the context files can answer a question, research it instead of asking, and record any findings worth keeping in `planning/research.md` with citations (Directive #2).
+
+### 7. Write the plan — `planning/features/<slug>/plan.md`
+Sections, in order:
+1. `## Goal`: only if step 5 was yes.
+2. **Problem Statement**
+3. **Solution**
+4. **User Stories**
+5. **Implementation Decisions**: which modules and files are touched, and which existing pattern each change follows (from the codebase map's Change Recipes).
+6. **Tasks**: an ordered checklist. Each task is small enough for one `/process` round and has a done-condition, e.g. `- [ ] T1 — Add CsvExporter in internal/export/ (done: unit tests pass)`. `/process` ticks these off.
+7. **Resources Needed**: input context, schemas, sample data, and API contracts that Step 2 (`/resources`) must gather.
+8. **Testing Decisions**: which test types apply, per [`engineering/testing`](../../engineering/testing/SKILL.md).
+9. **Out of Scope**
+10. **Further Notes**
+
+Frontmatter: `type: plan`, `scope: feature`, `status: draft`.
+
+### 8. Decision map (large work only)
+If the ask doesn't collapse into one plan, add `planning/decisions/<slug>.md` files instead of, or alongside, the plan. Each is OKF `type: resource`, with `status: open | blocked | resolved` and `blocked_by: [...]` pointing at other decision files. The open, unblocked files are the actionable frontier.
+
+### 9. Enrich `index.md` and log
+- Write any new domain terms or directives into the workspace `index.md` immediately. It is the glossary.
+- Append to `log.md`: the slug, the ask, and where the plan landed.
+
+### 10. Present & gate
+Present the plan (and any `index.md`/`log.md` changes) and wait for explicit confirmation before `resources/` work begins (Step 2). Never auto-advance.
 
 ## Notes
 - Never write to production code from this skill.
-- `engineering/code-review`'s Spec-Fidelity axis checks implementations against whatever this skill produced — keep plans specific enough to review against.
-- `engineering/software-engineer` requires this skill to have run before code gets written.
+- `engineering/code-review`'s Spec-Fidelity axis checks the implementation against this plan and the workspace definition, so keep both specific enough to review against.
+- `engineering/software-engineer` requires a plan before any code gets written.

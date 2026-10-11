@@ -1,20 +1,20 @@
 ---
 type: skill
 name: promote
-title: Promote (Step 4)
+title: Promote (Step 5)
 description: Human-authorized deployment of audited finalized/ content to production — apps/<workspace>/ in monorepo mode, or the workspace's Production Target Map in bolt-on mode. Use only when the human explicitly requests promotion.
-tags: [skill, productivity, lifecycle, step-4, host-mode]
+tags: [skill, productivity, lifecycle, step-5, host-mode]
 timestamp: 2026-10-11T00:00:00+02:00
 ---
 
-# Promote (Step 4)
+# Promote (Step 5)
 
 ## Trigger
 Use only when explicitly requested by the human. Never self-trigger — `AGENTS.md` Directive #7 requires explicit human instruction for this transition, and Directive #6 makes production AI-read-only outside of this step.
 
 ## Preconditions
 1. Read `host_mode` from `aiworkspace/host.md`. If it is `unset` or missing, stop and run `productivity/setup` first.
-2. Confirm `finalized/` has passed Step 3 — `finalized/review.md` exists and `log.md` records the gate results. If not, stop and say what's missing.
+2. Confirm `finalized/` has passed Step 4 — `finalized/review.md` exists and `log.md` records the gate results. If not, stop and say what's missing.
 
 ## Process — `monorepo`
 1. **Copy** audited content from `finalized/` into `apps/<workspace>/`, verbatim.

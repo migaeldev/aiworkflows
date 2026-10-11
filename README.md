@@ -8,7 +8,7 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
 
 ## What you get
 
-- **A 5-step gated lifecycle** — `planning/` → `resources/` → `processing/` → `finalized/` → `promote`. Agents never advance a step without explicit human approval.
+- **A 6-step gated lifecycle** — `define` → `plan` → `resources/` → `processing/` → `finalized/` → `promote`. Agents never advance a step without explicit human approval.
 - **A production immutability guardrail** — AI edits happen in a sandboxed `processing/` folder; only a human-issued `promote` touches production code.
 - **A skills library** — engineering (codebase mapping, code review, testing, diagnosis, architecture), security audits, productivity (planning, personas, handoffs, context management), and brand onboarding on top of a Material Design 3 template.
 - **Project context agents actually use** — a codebase map of where and how to change code, and a `soul.md` persona so agents write in your project's languages, patterns, and voice.
@@ -30,7 +30,7 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
    - **with your permission**, map the codebase into `aiworkspace/codebase-map.md` (languages, structure, patterns, conventions, comment scheme, and where/how to make each kind of change),
    - onboard your brand, its files, and your UI stack into `aiworkspace/brand/`, or use the neutral template defaults,
    - create `aiworkspace/soul.md`, a persona so agents speak and code *as your project*,
-   - scaffold your first workspace via `new-workspace`.
+   - create and define your first workspace via `/define`.
 
 ### Host modes
 
@@ -44,8 +44,8 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
 ## The lifecycle
 
 ```text
-[0: planning/] ──> [1: resources/] ──> [2: processing/] ──> [3: finalized/] ──> [4: promote] ──> [production]
- plan & research     input context      active iteration     audited & gated     human-only
+[0: define] ──> [1: plan] ──> [2: resources/] ──> [3: processing/] ──> [4: finalized/] ──> [5: promote] ──> [production]
+ workspace core   feature/tasks   input context      active iteration     audited & gated     human-only
 ```
 
 | Step | Command | What happens |
@@ -53,11 +53,12 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
 | — | `/map` | Create or refresh the codebase map (`codebase-map.md`) |
 | — | `/brand` | Onboard or change the brand (`brand/`), or choose template defaults |
 | — | `/persona` | Create or change the project or a workspace persona (`soul.md`) |
-| 0 | `/plan` | Project or Feature/Change plan, via a `grill-me` interview |
-| 1 | `/resources` | Collect the context, schemas, and data the plan calls for |
-| 2 | `/process` | Iterate on code and content inside `processing/` |
-| 3 | `/finalize` | Security audit, API spec (if applicable), docs, tests, dual-axis code review |
-| 4 | `/promote` | Human-authorized copy to production |
+| 0 | `/define` | Create a workspace and define its core (`definition.md`). Alias `/spec` |
+| 1 | `/plan` | Plan a feature/change as an ordered task list (defines the workspace first if needed) |
+| 2 | `/resources` | Collect the context, schemas, and data the plan calls for |
+| 3 | `/process` | Work through the plan's tasks inside `processing/` |
+| 4 | `/finalize` | Security audit, API spec (if applicable), docs, tests, dual-axis code review |
+| 5 | `/promote` | Human-authorized copy to production |
 
 Full specification: [`aiworkspace/README.md`](./aiworkspace/README.md).
 
@@ -79,7 +80,7 @@ Full specification: [`aiworkspace/README.md`](./aiworkspace/README.md).
     ├── soul.md                   # Project persona — /persona
     ├── skills/                   # design / engineering / productivity / security
     └── workspaces/
-        └── template-workspace/   # Boilerplate copied by new-workspace
+        └── template-workspace/   # Boilerplate copied by /define
 ```
 
 ---

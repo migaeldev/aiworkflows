@@ -26,7 +26,7 @@ Layering is **section by section**. A section in the workspace soul replaces the
 ## Trigger
 - `productivity/setup` (its persona step, project scope).
 - `/persona` (alias `/soul`), or a request to create, change, or show the persona.
-- Optionally from `productivity/new-workspace`, when a workspace's identity clearly differs from the project's.
+- Optionally from `productivity/define`, when a workspace's identity clearly differs from the project's.
 
 ## Process
 

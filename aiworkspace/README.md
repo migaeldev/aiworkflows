@@ -8,7 +8,7 @@ timestamp: 2026-10-11T00:00:00+02:00
 
 # AI Workspace & Open Knowledge Format (OKF)
 
-This folder hosts domain-specific AI knowledge workspaces and AI skills built on **Google's Open Knowledge Format (OKF v0.1)** and a **5-Step Lifecycle Architecture**. It provides a standardized, vendor-neutral, agent- and human-friendly structure for input context, generated content, human iteration, audited output, and the skills agents use along the way.
+This folder hosts domain-specific AI knowledge workspaces and AI skills built on **Google's Open Knowledge Format (OKF v0.1)** and a **6-Step Lifecycle Architecture**. It provides a standardized, vendor-neutral, agent- and human-friendly structure for input context, generated content, human iteration, audited output, and the skills agents use along the way.
 
 It is installed into a host repository and configured by [`productivity/setup`](./skills/productivity/setup/SKILL.md), which records:
 - [`host.md`](./host.md) — `host_mode`: where production code lives (`monorepo` → `apps/<workspace>/`; `bolt-on` → per-workspace Production Target Map).
@@ -38,7 +38,7 @@ All agents working in `aiworkspace/` are bound by [`AGENTS.md`](../AGENTS.md). I
 
 ## 🏛️ Architecture Overview
 
-1. **Domain Workspaces (`aiworkspace/workspaces/`)**: Work partitioned into a 5-stage lifecycle (`planning` ➔ `resources` ➔ `processing` ➔ `finalized` ➔ `promote`). New workspaces are copied from `workspaces/template-workspace/`.
+1. **Domain Workspaces (`aiworkspace/workspaces/`)**: Work partitioned into a 6-step lifecycle (`define` ➔ `plan` ➔ `resources` ➔ `processing` ➔ `finalized` ➔ `promote`). New workspaces are created by `define`, which copies `workspaces/template-workspace/`.
 2. **AI Skills Registry (`aiworkspace/skills/`)**: Skills categorized and formatted as OKF documents (`type: skill`).
 3. **Production**: wherever `host.md` says — `apps/<workspace>/` or the host repo's own paths — written only by a human-approved `promote`.
 
@@ -49,13 +49,14 @@ graph TD
     Root --> Config["host.md · project.md · codebase-map.md · brand/ · soul.md (written by setup)"]
 
     Workspaces --> Domain["<domain>/"]
-    Domain --> Step0["0. planning/ (Plan & Research)"]
-    Domain --> Step1["1. resources/"]
-    Domain --> Step2["2. processing/"]
-    Domain --> Step3["3. finalized/ (Audited Code & Specs)"]
-    Domain --> Step4["4. promote (Action)"]
-    Step4 --> Mono["monorepo: apps/<workspace>/"]
-    Step4 --> Bolt["bolt-on: Production Target Map"]
+    Domain --> Step0["0. definition.md (Define)"]
+    Domain --> Step1["1. planning/ (Plan features & tasks)"]
+    Domain --> Step2["2. resources/"]
+    Domain --> Step3["3. processing/"]
+    Domain --> Step4["4. finalized/ (Audited Code & Specs)"]
+    Domain --> Step5["5. promote (Action)"]
+    Step5 --> Mono["monorepo: apps/<workspace>/"]
+    Step5 --> Bolt["bolt-on: Production Target Map"]
 
     Skills --> Design["design/"]
     Skills --> Eng["engineering/"]
@@ -79,24 +80,34 @@ Every skill is an OKF document (`type: skill`) with structured YAML frontmatter.
 
 ---
 
-## 🔄 The 5-Step Lifecycle Pipeline
+## 🔄 The 6-Step Lifecycle Pipeline
 
-### Step 0: `planning/` (Plan & Research)
-- **Purpose**: Determine the shape of the work before `resources/` is populated. Driven by [`productivity/plan`](./skills/productivity/plan/SKILL.md).
-- **Two plan types**: a **Project Plan** (`planning/project-plan.md`, whole workspace, rare — triggered by `new-workspace`) or a **Feature/Change Plan** (`planning/features/<slug>/spec.md`, one unit of work, frequent).
-- **Rule**: `grill-me` always runs; `goal-driven` is only loaded if the user opts in. Every plan gets an optional, recommended `## Goal` section first.
-- **Large/ambiguous work**: may use `planning/decisions/*.md` instead of (or alongside) a single plan — a file-native decision frontier (`status: open | blocked | resolved`, `blocked_by: [...]`).
+```text
+[0: define] ──> [1: plan] ──> [2: resources/] ──> [3: processing/] ──> [4: finalized/] ──> [5: promote]
+```
 
-### Step 1: `resources/` (Input Context & Specifications)
-- **Purpose**: Input knowledge, data schemas, API specs, metric definitions, and domain documentation required to start a task.
-- **Rule**: Agents consult `resources/` first. **If it is empty or lacks necessary context, ask the user before proceeding.**
+### Step 0: Define (`definition.md`)
+- **Purpose**: Create a workspace and define its core. Driven by [`productivity/define`](./skills/productivity/define/SKILL.md) (`/define`, `/spec`).
+- **Output**: `definition.md` at the workspace root (purpose, scope, users, success criteria, directives, production target, known unknowns, candidate features), plus the core sections of `index.md` and a row in the registry.
+- **Cadence**: Once per workspace; revised rarely (redefine mode lists the plans a redefine affects).
 
-### Step 2: `processing/` (Generation & Active Iteration)
+### Step 1: Plan (`planning/`)
+- **Purpose**: Plan one feature, change, or batch of work inside a defined workspace. Driven by [`productivity/plan`](./skills/productivity/plan/SKILL.md) (`/plan`).
+- **Output**: `planning/features/<slug>/plan.md` covering problem, solution, implementation decisions, an ordered **Tasks** checklist, **Resources Needed**, testing decisions, and out of scope.
+- **Define first**: if the workspace doesn't exist or isn't defined, `plan` hands off to `define`. Asks outside the defined scope are flagged.
+- **Rule**: `grill-me` always runs; `goal-driven` is only loaded if the user opts in.
+- **Large/ambiguous work**: may use `planning/decisions/*.md` alongside the plan, as a file-native decision frontier (`status: open | blocked | resolved`, `blocked_by: [...]`).
+
+### Step 2: `resources/` (Input Context & Specifications)
+- **Purpose**: The input knowledge, schemas, API specs, and sample data listed in the plan's **Resources Needed** section.
+- **Rule**: **If it is empty or lacks necessary context, ask the user before proceeding.**
+
+### Step 3: `processing/` (Generation & Active Iteration)
 - **Purpose**: Active workspace where code, drafts, and iterative content live.
 - **Human In The Loop**: All modifications, reviews, and reframing by humans happen here.
 - **Rule**: **Never move files to `finalized/` without explicit human instruction.**
 
-### Step 3: `finalized/` (Audit, Verification Gates & Code Transfer)
+### Step 4: `finalized/` (Audit, Verification Gates & Code Transfer)
 - **Trigger**: ONLY when explicitly instructed by the human.
 - **Purpose**: Holds audited, production-ready output, API specs, security logs, review results, and test verification.
 - **Gates**: Content moves from `processing/` only after passing every applicable gate. A gate that does not apply is logged as `N/A` with a reason — never silently skipped:
@@ -106,7 +117,7 @@ Every skill is an OKF document (`type: skill`) with structured YAML frontmatter.
   4. **🧪 Verification & Tests** *(always)*: The build/lint/test commands from [`project.md`](./project.md). If no test suite exists, record what verification was done instead.
 - Plus the dual-axis [`engineering/code-review`](./skills/engineering/code-review/SKILL.md), persisted to `finalized/review.md`.
 
-### Step 4: `promote` (Human Authorization & Production Deployment)
+### Step 5: `promote` (Human Authorization & Production Deployment)
 - **Trigger**: ONLY when explicitly requested by the human. Driven by [`productivity/promote`](./skills/productivity/promote/SKILL.md).
 - **`monorepo`**: copies `finalized/` into `apps/<workspace>/`, writes its standalone `README.md`, and updates the root `README.md`.
 - **`bolt-on`**: copies each `finalized/` file to its destination in the workspace's Production Target Map; any unmapped file stops the promote until the human maps it.
@@ -139,15 +150,16 @@ Every skill is an OKF document (`type: skill`) with structured YAML frontmatter.
     ├── soul.md                        # Project persona (/persona)
     ├── skills/                        # design / engineering / productivity / security
     └── workspaces/
-        ├── template-workspace/        # Boilerplate copied by new-workspace
+        ├── template-workspace/        # Boilerplate copied by /define
         └── <domain>/
             ├── index.md               # Purpose, directives, glossary, production pointer / Target Map
+            ├── definition.md          # Step 0: workspace core (written by /define)
             ├── soul.md                # Optional workspace persona (layers over project soul)
             ├── log.md                 # Chronological audit & lifecycle log
-            ├── planning/              # Step 0: plans, research, decision maps
-            ├── resources/             # Step 1: source context, schemas, specs
-            ├── processing/            # Step 2: active iteration
-            └── finalized/             # Step 3: audited output, specs, review.md, test results
+            ├── planning/              # Step 1: features/<slug>/plan.md, research, decision maps
+            ├── resources/             # Step 2: source context, schemas, specs
+            ├── processing/            # Step 3: active iteration
+            └── finalized/             # Step 4: audited output, specs, review.md, test results
 ```
 
 ---
@@ -159,7 +171,7 @@ Every document across `skills/`, `resources/`, `processing/`, and `finalized/` i
 ```yaml
 ---
 type: skill | dataset | table | metric | playbook | api | domain | resource | plan  # REQUIRED
-scope: project | feature                                              # For type: plan only
+scope: workspace | feature                                            # For type: plan only
 name: skill-identifier                                                 # For skills
 title: Human-readable Title                                            # Recommended
 description: Concise description of the concept                         # Recommended
@@ -186,11 +198,12 @@ timestamp: 2026-09-09T13:45:03+02:00                                    # Option
 | **Skills Registry** | `aiworkspace/skills/README.md` | All available skills |
 | **Domain Entrypoint** | `aiworkspace/workspaces/<domain>/index.md` | Identity, instructions, production pointer |
 | **Domain Log** | `aiworkspace/workspaces/<domain>/log.md` | Audit & change log |
-| **Step 0 - Planning** | `aiworkspace/workspaces/<domain>/planning/` | Plans, research, decision maps |
-| **Step 1 - Resources** | `aiworkspace/workspaces/<domain>/resources/` | Input context and schemas |
-| **Step 2 - Processing** | `aiworkspace/workspaces/<domain>/processing/` | Active iteration |
-| **Step 3 - Finalized** | `aiworkspace/workspaces/<domain>/finalized/` | Audited output, specs, logs, test results |
-| **Step 4 - Promote** | `promote` action | `apps/<workspace>/` (monorepo) or Target Map (bolt-on) |
+| **Step 0 - Define** | `aiworkspace/workspaces/<domain>/definition.md` | Workspace core definition |
+| **Step 1 - Plan** | `aiworkspace/workspaces/<domain>/planning/` | Feature plans & tasks, research, decision maps |
+| **Step 2 - Resources** | `aiworkspace/workspaces/<domain>/resources/` | Input context and schemas |
+| **Step 3 - Processing** | `aiworkspace/workspaces/<domain>/processing/` | Active iteration |
+| **Step 4 - Finalized** | `aiworkspace/workspaces/<domain>/finalized/` | Audited output, specs, logs, test results |
+| **Step 5 - Promote** | `promote` action | `apps/<workspace>/` (monorepo) or Target Map (bolt-on) |
 
 ---
 
@@ -204,11 +217,11 @@ Every command is a faster on-ramp into the same skill content above, never a rep
 | Codebase map | `/map` | `/remap` | [`skills/engineering/codebase-map/SKILL.md`](./skills/engineering/codebase-map/SKILL.md) |
 | Brand | `/brand` | — | [`skills/design/brand-onboarding/SKILL.md`](./skills/design/brand-onboarding/SKILL.md) |
 | Persona | `/persona` | `/soul` | [`skills/productivity/persona/SKILL.md`](./skills/productivity/persona/SKILL.md) |
-| New workspace | `/new-workspace` | — | [`skills/productivity/new-workspace/SKILL.md`](./skills/productivity/new-workspace/SKILL.md) |
-| Step 0 — Planning | `/plan` | `/step0`, `/research` | [`skills/productivity/plan/SKILL.md`](./skills/productivity/plan/SKILL.md) |
-| Step 1 — Resources | `/resources` | `/step1`, `/spec` | [`skills/productivity/resources/SKILL.md`](./skills/productivity/resources/SKILL.md) |
-| Step 2 — Processing | `/process` | `/step2`, `/processing` | [`skills/productivity/process/SKILL.md`](./skills/productivity/process/SKILL.md) |
-| Step 3 — Finalize | `/finalize` | `/step3`, `/approve` | [`skills/productivity/finalize/SKILL.md`](./skills/productivity/finalize/SKILL.md) |
-| Step 4 — Promote | `/promote` | `/step4`, `/deploy` | [`skills/productivity/promote/SKILL.md`](./skills/productivity/promote/SKILL.md) |
+| Step 0 — Define | `/define` | `/spec`, `/step0`, `/new-workspace` | [`skills/productivity/define/SKILL.md`](./skills/productivity/define/SKILL.md) |
+| Step 1 — Plan | `/plan` | `/step1`, `/research` | [`skills/productivity/plan/SKILL.md`](./skills/productivity/plan/SKILL.md) |
+| Step 2 — Resources | `/resources` | `/step2` | [`skills/productivity/resources/SKILL.md`](./skills/productivity/resources/SKILL.md) |
+| Step 3 — Processing | `/process` | `/step3`, `/processing` | [`skills/productivity/process/SKILL.md`](./skills/productivity/process/SKILL.md) |
+| Step 4 — Finalize | `/finalize` | `/step4`, `/approve` | [`skills/productivity/finalize/SKILL.md`](./skills/productivity/finalize/SKILL.md) |
+| Step 5 — Promote | `/promote` | `/step5`, `/deploy` | [`skills/productivity/promote/SKILL.md`](./skills/productivity/promote/SKILL.md) |
 
 Every alias resolves to exactly the same skill as its primary — synonyms, not separate behaviors.

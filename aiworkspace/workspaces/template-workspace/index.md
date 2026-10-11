@@ -8,7 +8,7 @@ timestamp: 2026-09-09T13:40:45+02:00
 
 # <Workspace Title> Domain Knowledge Workspace
 
-Welcome to the **<Workspace Title>** domain workspace, formatted according to the Google Open Knowledge Format (OKF v0.1) and the **5-Step Lifecycle Architecture**.
+Welcome to the **<Workspace Title>** domain workspace, formatted according to the Google Open Knowledge Format (OKF v0.1) and the **6-Step Lifecycle Architecture**. The workspace's core is defined in [`definition.md`](./definition.md).
 
 ---
 
@@ -27,7 +27,7 @@ _Check [`aiworkspace/host.md`](../../host.md)'s `host_mode` before filling this 
 >
 > - **Human Approval Requirement**: All production deployments require explicit human authorization via a `promote` command.
 > - **Iteration Location**: All feature additions, bug fixes, refactoring, and code changes MUST take place inside [`aiworkspace/workspaces/<workspace>/processing/`](./processing/README.md).
-> - **Copy-First Strategy**: If existing production code requires updates, first sync/copy it back into `processing/`, perform and test all modifications there, gain human approval, pass Step 3 verification gates to move to `finalized/`, and wait for the human to trigger `promote`.
+> - **Copy-First Strategy**: If existing production code requires updates, first sync/copy it back into `processing/`, perform and test all modifications there, gain human approval, pass Step 4 verification gates to move to `finalized/`, and wait for the human to trigger `promote`.
 
 ### If `host_mode: bolt-on` (`aiworkspace` added into an existing repo with no `apps/` folder)
 
@@ -37,7 +37,7 @@ _Check [`aiworkspace/host.md`](../../host.md)'s `host_mode` before filling this 
 >
 > - **Human Approval Requirement**: All production deployments require explicit human authorization via a `promote` command.
 > - **Iteration Location**: All feature additions, bug fixes, refactoring, and code changes MUST take place inside [`aiworkspace/workspaces/<workspace>/processing/`](./processing/README.md).
-> - **Copy-First Strategy**: If existing production code requires updates, first sync/copy it back into `processing/`, perform and test all modifications there, gain human approval, pass Step 3 verification gates to move to `finalized/`, and wait for the human to trigger `promote`.
+> - **Copy-First Strategy**: If existing production code requires updates, first sync/copy it back into `processing/`, perform and test all modifications there, gain human approval, pass Step 4 verification gates to move to `finalized/`, and wait for the human to trigger `promote`.
 
 #### 🎯 Production Target Map
 
@@ -51,7 +51,7 @@ _Check [`aiworkspace/host.md`](../../host.md)'s `host_mode` before filling this 
 
 ## 🎭 Domain Identity, Directives & Glossary
 
-_Filled in by `productivity/plan` running in Project Plan mode (invoked via `productivity/new-workspace`'s Step 3) — this section stays a placeholder until that interview runs. Never pre-fill it with another workspace's real content._
+_Filled in by `productivity/define` (Step 0) in sync with [`definition.md`](./definition.md), which holds the full definition. This section is a short summary. It stays a placeholder until `/define` runs; never pre-fill it with another workspace's real content._
 
 - **Domain Purpose**: _[placeholder]_
 - **Persona**: inherits the project soul (`aiworkspace/soul.md`). _If this workspace needs a different voice or code style, run `/persona` at workspace scope to create `./soul.md` and link it here._
@@ -60,17 +60,19 @@ _Filled in by `productivity/plan` running in Project Plan mode (invoked via `pro
 
 ---
 
-## 🗂️ 5-Step Workspace Lifecycle Pipeline
+## 🗂️ 6-Step Workspace Lifecycle Pipeline
 
-0. **Step 0 - Planning**: [`planning/`](./planning/README.md)
-   - Project Plan and Feature/Change Plans, research notes, and (for large work) a decision map. Produced by `productivity/plan`.
-1. **Step 1 - Resources Catalog**: [`resources/`](./resources/README.md)
-   - Input context, schemas, metrics definitions, and initial specifications, informed by Step 0.
-2. **Step 2 - Processing & Iteration**: [`processing/`](./processing/README.md)
+0. **Step 0 - Define**: [`definition.md`](./definition.md)
+   - The workspace core: purpose, scope, users, success criteria, directives, production target. Produced by `productivity/define`.
+1. **Step 1 - Plan**: [`planning/`](./planning/README.md)
+   - Feature/change plans with ordered task lists, research notes, and (for large work) a decision map. Produced by `productivity/plan`.
+2. **Step 2 - Resources Catalog**: [`resources/`](./resources/README.md)
+   - Input context, schemas, and specifications listed in the plan's Resources Needed.
+3. **Step 3 - Processing & Iteration**: [`processing/`](./processing/README.md)
    - Generated content, human validation feedback, and active code iterations.
-3. **Step 3 - Finalized & Audited**: [`finalized/`](./finalized/README.md)
+4. **Step 4 - Finalized & Audited**: [`finalized/`](./finalized/README.md)
    - Audited code, dual-axis review (`review.md`), security logs, and test results.
-4. **Step 4 - Promote**: see "Production Application Location" above (`apps/<workspace>/` in `monorepo` mode, or the Production Target Map in `bolt-on` mode)
+5. **Step 5 - Promote**: see "Production Application Location" above (`apps/<workspace>/` in `monorepo` mode, or the Production Target Map in `bolt-on` mode)
    - Human-authorized deployment.
 
 ---

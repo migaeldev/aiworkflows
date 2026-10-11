@@ -1,11 +1,10 @@
-# Planning Stage (Step 0)
+# Planning Stage (Step 1)
 
-This folder stores Step 0 planning artifacts: the workspace's Project Plan, individual Feature/Change Plans, research notes, and (for large/ambiguous work) a file-native decision map — all produced by the `productivity/plan` skill before `resources/` work begins.
+This folder stores Step 1 planning artifacts: feature/change plans, research notes, and (for large/ambiguous work) a file-native decision map, all produced by the `productivity/plan` skill before `resources/` work begins. The workspace's core definition (Step 0) lives one level up in `definition.md`.
 
 - **Status**: Pre-`resources/` planning and research.
-- **Workflow**: `productivity/plan` always runs `grill-me`; `goal-driven` is loaded only if the user opts in. Every plan gets an optional, recommended `## Goal` section first.
+- **Workflow**: `productivity/plan` checks each ask against `definition.md`, always runs `grill-me`, and loads `goal-driven` only if the user opts in.
 - **Contents**:
-  - `project-plan.md` — whole-workspace scope, written once at inception (see `productivity/new-workspace`'s Step 3).
-  - `features/<slug>/spec.md` — one per feature/change, written every time this stage runs for a new ask.
-  - `research.md` — optional findings that informed a plan, with citations.
-  - `decisions/<slug>.md` — optional, only for large/ambiguous work; file-native decision map (`status: open | blocked | resolved`, `blocked_by: [...]`).
+  - `features/<slug>/plan.md`: one per feature/change, with an ordered **Tasks** checklist (ticked off by `/process`) and a **Resources Needed** list (gathered by `/resources`).
+  - `research.md`: optional findings that informed a plan or the definition, with citations.
+  - `decisions/<slug>.md`: optional, only for large/ambiguous work; a file-native decision map (`status: open | blocked | resolved`, `blocked_by: [...]`).

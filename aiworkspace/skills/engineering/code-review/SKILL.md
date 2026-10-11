@@ -65,7 +65,7 @@ Run both. A change can pass one and fail the other — clean code that solves th
 ## Axis B — Spec Fidelity
 Does the implementation actually satisfy what was asked, independent of code quality?
 
-- What was the originating ask? Check `planning/features/<slug>/spec.md` and/or `planning/project-plan.md` if Step 0 planning exists for this work; otherwise the user's original request and `resources/`.
+- What was the originating ask? Check `planning/features/<slug>/plan.md` (including its Tasks) and the workspace's `definition.md` (scope and directives) if they exist for this work; otherwise the user's original request and `resources/`.
 - Does the implementation cover every requirement in that plan — not just the ones that were easiest to build?
 - Did anything get silently descoped, simplified, or reinterpreted without flagging it?
 - Are there requirements the plan stated that this change doesn't address at all?
