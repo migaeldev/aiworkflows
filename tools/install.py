@@ -1,9 +1,9 @@
 """Install or upgrade the aiworkspace harness in a target repository.
 
-Run from a checkout of the harness:
-    python tools/install.py <target-repo>             # install, or upgrade an existing install
-    python tools/install.py <target-repo> --dry-run   # show what would change, write nothing
-    python tools/install.py <target-repo> --force     # also overwrite files you edited locally
+Run from a checkout of the harness. <target-repo> defaults to the current directory:
+    python tools/install.py [<target-repo>]             # install, or upgrade an existing install
+    python tools/install.py [<target-repo>] --dry-run   # show what would change, write nothing
+    python tools/install.py [<target-repo>] --force     # also overwrite files you edited locally
 
 What gets written:
 - Core files (skills, specialist agents, workspace template, aiworkspace/README.md, Claude Code
@@ -205,7 +205,8 @@ def _print_report(report: Report, target: Path, dry_run: bool) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Install or upgrade the aiworkspace harness in a repository.")
-    parser.add_argument("target", type=Path, help="path to the repository to install into")
+    parser.add_argument("target", type=Path, nargs="?", default=Path("."),
+                         help="path to the repository to install into (default: current directory)")
     parser.add_argument("--dry-run", action="store_true", help="show what would change without writing")
     parser.add_argument("--force", action="store_true", help="overwrite locally edited harness files")
     args = parser.parse_args()

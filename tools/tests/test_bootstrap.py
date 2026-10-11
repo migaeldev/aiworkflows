@@ -39,9 +39,9 @@ class BootstrapTestCase(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("sh"), "no POSIX sh on this machine")
 class BootstrapShTest(BootstrapTestCase):
-    def run_script(self, *args, env=None):
+    def run_script(self, *args, env=None, cwd=None):
         return subprocess.run(["sh", str(HARNESS / "tools" / "bootstrap.sh"), *args],
-                               capture_output=True, text=True, env=env)
+                               capture_output=True, text=True, env=env, cwd=cwd)
 
     def test_installs_with_explicit_repo_url(self):
         result = self.run_script(str(self.repo), str(self.target), "--dry-run")
@@ -61,10 +61,10 @@ class BootstrapShTest(BootstrapTestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Would install aiworkspace harness", result.stdout)
 
-    def test_missing_target_is_a_usage_error(self):
-        result = self.run_script(str(self.repo))
-        self.assertEqual(result.returncode, 2)
-        self.assertIn("usage:", result.stderr)
+    def test_target_defaults_to_the_current_directory(self):
+        result = self.run_script(str(self.repo), cwd=str(self.target))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((self.target / "aiworkspace" / "host.md").exists())
 
     def test_no_arguments_is_a_usage_error(self):
         result = self.run_script()
@@ -76,11 +76,11 @@ class BootstrapShTest(BootstrapTestCase):
 class BootstrapPs1Test(BootstrapTestCase):
     EXE = shutil.which("pwsh") or shutil.which("powershell")
 
-    def run_script(self, *args, env=None):
+    def run_script(self, *args, env=None, cwd=None):
         return subprocess.run(
             [self.EXE, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
              "-File", str(HARNESS / "tools" / "bootstrap.ps1"), *args],
-            capture_output=True, text=True, env=env)
+            capture_output=True, text=True, env=env, cwd=cwd)
 
     def test_installs_with_explicit_repo_url(self):
         result = self.run_script("-RepoUrl", str(self.repo), "-Target", str(self.target), "--dry-run")
@@ -103,6 +103,11 @@ class BootstrapPs1Test(BootstrapTestCase):
     def test_missing_repo_url_is_an_error(self):
         result = self.run_script("-Target", str(self.target))
         self.assertNotEqual(result.returncode, 0)
+
+    def test_target_defaults_to_the_current_directory(self):
+        result = self.run_script("-RepoUrl", str(self.repo), cwd=str(self.target))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((self.target / "aiworkspace" / "host.md").exists())
 
 
 if __name__ == "__main__":

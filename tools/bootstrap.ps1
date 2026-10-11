@@ -10,17 +10,16 @@ Downloaded to a file and run directly:
 .EXAMPLE
 As a one-liner, piped straight from a raw URL (PowerShell needs the wrapper below to pass
 parameters through a piped script block):
-    iex "& { $(irm <raw-url-of-this-script>) } -RepoUrl <repo-url> -Target <target-repo>"
+    iex "& { $(irm <raw-url-of-this-script>) } -RepoUrl <repo-url>"
 
-RepoUrl can be omitted if $env:AIWORKSPACE_REPO_URL is set. Any arguments after -Target are
-forwarded to install.py (e.g. --dry-run, --force). The clone is removed when the script exits,
-whether or not the install succeeds.
+RepoUrl can be omitted if $env:AIWORKSPACE_REPO_URL is set. Target defaults to the current
+directory. Any arguments after -Target are forwarded to install.py (e.g. --dry-run, --force).
+The clone is removed when the script exits, whether or not the install succeeds.
 #>
 [CmdletBinding()]
 param(
     [string]$RepoUrl = $env:AIWORKSPACE_REPO_URL,
-    [Parameter(Mandatory = $true)]
-    [string]$Target,
+    [string]$Target = ".",
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$InstallArgs
 )

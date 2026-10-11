@@ -2,18 +2,20 @@
 # Fetch the aiworkspace harness with a shallow clone and run its installer, so a target repo
 # never needs a manual checkout of the harness.
 #
-#   curl -fsSL <raw-url-of-this-script> | sh -s -- <repo-url> <target-repo> [install.py options]
+#   curl -fsSL <raw-url-of-this-script> | sh -s -- <repo-url> [target-repo] [install.py options]
 #
 # repo-url can be omitted (and dropped from argv entirely) if AIWORKSPACE_REPO_URL is set:
-#   AIWORKSPACE_REPO_URL=<repo-url> curl -fsSL <raw-url-of-this-script> | sh -s -- <target-repo> [options]
+#   AIWORKSPACE_REPO_URL=<repo-url> curl -fsSL <raw-url-of-this-script> | sh -s -- [target-repo] [options]
 #
-# The clone is removed when the script exits, whether or not the install succeeds.
+# target-repo defaults to the current directory. The clone is removed when the script exits,
+# whether or not the install succeeds.
 
 set -eu
 
 usage() {
-    echo "usage: $0 [<repo-url>] <target-repo> [install.py options]" >&2
+    echo "usage: $0 [<repo-url>] [target-repo] [install.py options]" >&2
     echo "       repo-url may be omitted if \$AIWORKSPACE_REPO_URL is set" >&2
+    echo "       target-repo defaults to the current directory" >&2
     exit 2
 }
 
@@ -24,7 +26,6 @@ else
     REPO_URL="$1"
     shift
 fi
-[ "$#" -ge 1 ] || usage
 
 command -v git >/dev/null 2>&1 || { echo "error: git is required" >&2; exit 1; }
 PYTHON=python3

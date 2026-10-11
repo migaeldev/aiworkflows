@@ -8,18 +8,22 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
 
 ## Quickstart
 
-No checkout needed — this fetches a shallow clone to a temp directory, runs the installer, and cleans up:
+No checkout needed — this fetches a shallow clone to a temp directory, runs the installer, and cleans up. Run it from inside the repo you're installing into; the target defaults to the current directory.
+
+**Linux / macOS:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/migaeldev/aiworkflows/master/tools/bootstrap.sh \
-  | sh -s -- https://github.com/migaeldev/aiworkflows path/to/your-repo
+  | sh -s -- https://github.com/migaeldev/aiworkflows
 ```
+
+**Windows (PowerShell):**
 
 ```powershell
-iex "& { $(irm https://raw.githubusercontent.com/migaeldev/aiworkflows/master/tools/bootstrap.ps1) } -RepoUrl https://github.com/migaeldev/aiworkflows -Target path\to\your-repo"
+iex "& { $(irm https://raw.githubusercontent.com/migaeldev/aiworkflows/master/tools/bootstrap.ps1) } -RepoUrl https://github.com/migaeldev/aiworkflows"
 ```
 
-Add `--dry-run` to preview first. See [Install](#install) below for the from-a-checkout form, what gets written, and upgrading.
+Add `--dry-run` to preview first. To target a different directory instead of the current one, append it as an extra argument (sh) or `-Target path\to\your-repo` (PowerShell). See [Install](#install) below for the from-a-checkout form, what gets written, and upgrading.
 
 ---
 
@@ -37,23 +41,24 @@ Add `--dry-run` to preview first. See [Install](#install) below for the from-a-c
 
 Requires Python 3.8+ (standard library only) and git.
 
-**Without a checkout**, `tools/bootstrap.sh` (macOS/Linux) and `tools/bootstrap.ps1` (Windows) fetch a shallow clone of this repository into a temp directory, run the installer, and delete the clone again:
+**Without a checkout**, `tools/bootstrap.sh` (Linux/macOS) and `tools/bootstrap.ps1` (Windows) fetch a shallow clone of this repository into a temp directory, run the installer, and delete the clone again. Run from inside the repo you're installing into — the target defaults to the current directory:
 
 ```bash
-curl -fsSL <raw-url-of-tools/bootstrap.sh> | sh -s -- <this-repo-url> path/to/your-repo --dry-run
+curl -fsSL <raw-url-of-tools/bootstrap.sh> | sh -s -- <this-repo-url> --dry-run
 ```
 
 ```powershell
-iex "& { $(irm <raw-url-of-tools/bootstrap.ps1>) } -RepoUrl <this-repo-url> -Target path/to/your-repo --dry-run"
+iex "& { $(irm <raw-url-of-tools/bootstrap.ps1>) } -RepoUrl <this-repo-url> --dry-run"
 ```
 
-Set `AIWORKSPACE_REPO_URL` (sh: env var: `AIWORKSPACE_REPO_URL=<this-repo-url>`; PowerShell: `$env:AIWORKSPACE_REPO_URL`) to drop the repo-url argument from every call — handy as a saved alias. Drop `--dry-run` to actually install.
+Set `AIWORKSPACE_REPO_URL` (sh: env var: `AIWORKSPACE_REPO_URL=<this-repo-url>`; PowerShell: `$env:AIWORKSPACE_REPO_URL`) to drop the repo-url argument from every call — handy as a saved alias. Drop `--dry-run` to actually install. To target a different directory, append it as an extra argument (sh) or pass `-Target path/to/your-repo` (PowerShell).
 
-**From a checkout** of this repository:
+**From a checkout** of this repository (also defaults to the current directory):
 
 ```bash
-python tools/install.py path/to/your-repo --dry-run   # preview
-python tools/install.py path/to/your-repo             # install
+python tools/install.py path/to/your-repo --dry-run   # preview a specific target
+python tools/install.py --dry-run                     # preview, installing into the current directory
+python tools/install.py                               # install into the current directory
 ```
 
 The installer writes:
