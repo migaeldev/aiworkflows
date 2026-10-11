@@ -137,7 +137,11 @@ From an empty install to your first planned feature:
 
 ```mermaid
 flowchart TD
-    A["python tools/install.py your-repo"] --> A2["agent_pointers.py<br/>point your AI tools at AGENTS.md"]
+    Start{"Install the harness"}
+    Start -- "run it yourself" --> A["install.py, or the bootstrap.sh / bootstrap.ps1 one-liner"]
+    Start -- "ask your AI agent" --> A1["Agent runs the installer for you"]
+    A --> A2["agent_pointers.py<br/>point your AI tools at AGENTS.md"]
+    A1 --> A2
     A2 --> B["Open the repo in your agent"]
     B --> C["/setup"]
     C --> D["Detect stack and agent files"]
@@ -238,26 +242,10 @@ The "Slash Commands & Aliases" table in [`aiworkspace/README.md`](./aiworkspace/
 
 ```bash
 python tools/gen_claude_adapters.py          # regenerate after editing the table or a skill description
-python tools/check_harness.py                # links, leftover names, adapters in sync — exit 1 on any problem (use in CI)
-python -m unittest discover tools            # tests for the tools themselves
+python -m unittest discover tools/tests      # tests for the tools themselves
 ```
 
 Adapter behavior:
 - Primary commands carry the canonical skill's description, so Claude can also pick them up from plain-language requests.
 - Aliases, `/finalize`, and `/promote` set `disable-model-invocation: true`. Only a human typing the command runs them (Directive #7).
 - `/plan` intentionally replaces Claude Code's built-in plan-mode command in the terminal. Plan mode is still available with Shift+Tab.
-
-### Why the checks are needed
-
-The harness is plain Markdown that agents follow literally, so mistakes that are harmless in normal docs become behavior bugs here:
-
-- **A broken link is a missing instruction.** When `AGENTS.md` tells an agent to "follow `skills/x/SKILL.md`" and that file doesn't exist, the agent improvises or silently skips the step. The link check catches this before it ships to every repo the harness is installed in.
-- **A leftover name leaks the old project into every new one.** The harness was extracted from a real project. One forgotten "use <old company>'s palette" rule or `apps/<old-app>/` path would send agents in an unrelated repo after a brand and folders that don't exist. Absolute paths like a home directory break on every other machine.
-- **Stale adapters make commands disagree.** If the command table changes but `.claude/skills/` isn't regenerated, `/name` in Claude Code runs something different from what the docs (and other agents) say. The installer also refuses to ship stale adapters.
-
-Run `python tools/check_harness.py` before committing changes to the harness, and in CI on every push.
-
-`check_harness.py` runs three checks:
-- **links**: every relative Markdown link and image resolves (code blocks, inline code, and external URLs are skipped).
-- **leftovers**: no names from the project the harness was extracted from, and no absolute file URLs or user home-directory paths. The denylist is `LEFTOVER_PATTERNS` in the script. Keep it specific: generic technologies used as examples in skills (Flask, BigQuery, …) are fine.
-- **adapters**: `.claude/skills/` matches the command table (same as `gen_claude_adapters.py --check`).

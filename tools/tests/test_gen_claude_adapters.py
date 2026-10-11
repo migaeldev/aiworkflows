@@ -1,11 +1,13 @@
-"""Unit tests for gen_claude_adapters. Run: python -m unittest discover tools"""
+"""Unit tests for gen_claude_adapters. Run: python -m unittest discover tools/tests"""
 
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-import gen_claude_adapters as gen
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import gen_claude_adapters as gen  # noqa: E402
 
 TABLE = """\
 ## ⌨️ Slash Commands & Aliases (Canonical List)

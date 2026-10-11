@@ -1,14 +1,18 @@
-"""Tests for install.py. Run: python -m unittest discover tools"""
+"""Tests for install.py. Run: python -m unittest discover tools/tests"""
 
 import shutil
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-import gen_claude_adapters as gen
-import install
+TOOLS = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(TOOLS))
 
-HARNESS = Path(__file__).resolve().parent.parent
+import gen_claude_adapters as gen  # noqa: E402
+import install  # noqa: E402
+
+HARNESS = TOOLS.parent
 
 
 class InstallTestCase(unittest.TestCase):

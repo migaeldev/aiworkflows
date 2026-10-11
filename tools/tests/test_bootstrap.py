@@ -1,4 +1,4 @@
-"""Tests for bootstrap.sh / bootstrap.ps1. Run: python -m unittest discover tools
+"""Tests for bootstrap.sh / bootstrap.ps1. Run: python -m unittest discover tools/tests
 
 Exercises each script end to end (shallow clone + install.py --dry-run) against a throwaway
 local git repo, so no network access is required.
@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-HARNESS = Path(__file__).resolve().parent.parent
+HARNESS = Path(__file__).resolve().parent.parent.parent
 
 
 class BootstrapTestCase(unittest.TestCase):

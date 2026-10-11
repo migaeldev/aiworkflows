@@ -1,12 +1,14 @@
-"""Tests for aiworkspace/scripts/agent_pointers.py. Run: python -m unittest discover tools"""
+"""Tests for aiworkspace/scripts/agent_pointers.py. Run: python -m unittest discover tools/tests"""
 
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-HARNESS = Path(__file__).resolve().parent.parent
+TOOLS = Path(__file__).resolve().parent.parent
+HARNESS = TOOLS.parent
 sys.path.insert(0, str(HARNESS / "aiworkspace" / "scripts"))
+sys.path.insert(0, str(TOOLS))
 
 import agent_pointers as ap  # noqa: E402
 import install  # noqa: E402
