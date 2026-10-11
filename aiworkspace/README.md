@@ -225,3 +225,5 @@ Every command is a faster on-ramp into the same skill content above, never a rep
 | Step 5 — Promote | `/promote` | `/step5`, `/deploy` | [`skills/productivity/promote/SKILL.md`](./skills/productivity/promote/SKILL.md) |
 
 Every alias resolves to exactly the same skill as its primary — synonyms, not separate behaviors.
+
+**Claude Code**: each primary and alias above has a generated adapter in `.claude/skills/<name>/SKILL.md`. After changing this table, regenerate them with `python tools/gen_claude_adapters.py` (harness repo only). In Claude Code, `/plan` replaces the built-in plan-mode command; plan mode stays on Shift+Tab.

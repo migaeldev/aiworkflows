@@ -24,6 +24,7 @@ Built on **Google's Open Knowledge Format (OKF v0.1)**: every rule, skill, and w
    - `aiworkspace/`
    - `AGENTS.md`
    - `CLAUDE.md` *(if the repo already has one, append a pointer to `AGENTS.md` instead of overwriting it)*
+   - `.claude/skills/` *(Claude Code only: the slash-command adapters; merge alongside any skills the repo already has)*
 2. Open the repo in your agent and run **`/setup`** (or ask it to "set up aiworkspace"). Setup will:
    - detect your stack and propose a `host_mode`,
    - write `aiworkspace/host.md` and `aiworkspace/project.md`,
@@ -70,6 +71,8 @@ Full specification: [`aiworkspace/README.md`](./aiworkspace/README.md).
 .
 ├── AGENTS.md                     # Agent-agnostic operating rules (source of truth)
 ├── CLAUDE.md                     # Claude Code pointer to AGENTS.md
+├── .claude/skills/               # Generated Claude Code slash-command adapters (/plan, /spec, …)
+├── tools/                        # Harness maintenance scripts (not copied into host repos)
 └── aiworkspace/
     ├── README.md                 # Architecture, lifecycle & slash-command spec
     ├── index.md                  # Registry of workspaces & skills (filled as you go)
@@ -85,8 +88,22 @@ Full specification: [`aiworkspace/README.md`](./aiworkspace/README.md).
 
 ---
 
+## Maintaining the harness
+
+The "Slash Commands & Aliases" table in [`aiworkspace/README.md`](./aiworkspace/README.md) is the single source of truth for commands. The Claude Code adapters in `.claude/skills/` are generated from it, so never edit them by hand:
+
+```bash
+python tools/gen_claude_adapters.py          # regenerate after editing the table or a skill description
+python tools/gen_claude_adapters.py --check  # exit 1 if adapters are out of date (use in CI)
+python -m unittest discover tools            # generator tests
+```
+
+Adapter behavior:
+- Primary commands carry the canonical skill's description, so Claude can also pick them up from plain-language requests.
+- Aliases, `/finalize`, and `/promote` set `disable-model-invocation: true`. Only a human typing the command runs them (Directive #7).
+- `/plan` intentionally replaces Claude Code's built-in plan-mode command in the terminal. Plan mode is still available with Shift+Tab.
+
 ## Roadmap
 
 - [ ] Installer (`npx degit` / install script) that copies the harness and merges into an existing `CLAUDE.md`/`AGENTS.md` without overwriting
-- [ ] `.claude/skills/` adapters so lifecycle commands appear as native Claude Code slash commands
 - [ ] Link checker and "no leftover project names" check for the harness itself
