@@ -42,18 +42,21 @@ Ask: *"Want to frame this with `productivity/goal-driven` (success criteria / co
 ### 6. Interview with grill-me
 Invoke [`productivity/grill-me`](../grill-me/SKILL.md): one question at a time, each with your recommended answer. Where the codebase or the context files can answer a question, research it instead of asking, and record any findings worth keeping in `planning/research.md` with citations (Directive #2).
 
+Include a constraints question: *"Any constraints this feature must respect beyond the workspace's directives? (performance budget, security/compat limits, must-not-break invariants)"* — this narrows or inherits `definition.md`'s directives rather than repeating them. "None beyond workspace directives" is a valid, explicit answer.
+
 ### 7. Write the plan — `planning/features/<slug>/plan.md`
 Sections, in order:
 1. `## Goal`: only if step 5 was yes.
 2. **Problem Statement**
 3. **Solution**
 4. **User Stories**
-5. **Implementation Decisions**: which modules and files are touched, and which existing pattern each change follows (from the codebase map's Change Recipes).
-6. **Tasks**: an ordered checklist. Each task is small enough for one `/process` round and has a done-condition, e.g. `- [ ] T1 — Add CsvExporter in internal/export/ (done: unit tests pass)`. `/process` ticks these off.
-7. **Resources Needed**: input context, schemas, sample data, and API contracts that Step 2 (`/resources`) must gather.
-8. **Testing Decisions**: which test types apply, per [`engineering/testing`](../../engineering/testing/SKILL.md).
-9. **Out of Scope**
-10. **Further Notes**
+5. **Implementation Decisions**: which modules and files are touched, and which existing pattern each change follows (from the codebase map's Change Recipes). For any decision where more than one viable approach existed, record it ADR-style — the decision made, the alternatives considered, and the consequences/trade-offs — not just the choice with no reasoning attached. A decision with only one viable approach doesn't need this; don't manufacture alternatives that were never real.
+6. **Constraints**: the quality bar this feature's tasks must not violate — performance budgets, security/compat limits, must-not-break invariants — narrowed from or inheriting the workspace's directives. "None beyond workspace directives" is valid and explicit.
+7. **Tasks**: an ordered checklist. Each task is small enough for one `/process` round and has a done-condition, e.g. `- [ ] T1 — Add CsvExporter in internal/export/ (done: unit tests pass)`. `/process` ticks these off.
+8. **Resources Needed**: input context, schemas, sample data, and API contracts that Step 2 (`/resources`) must gather.
+9. **Testing Decisions**: which test types apply, per [`engineering/testing`](../../engineering/testing/SKILL.md).
+10. **Out of Scope**
+11. **Further Notes**
 
 Frontmatter: `type: plan`, `scope: feature`, `status: draft`.
 

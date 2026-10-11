@@ -13,6 +13,27 @@ A discipline for hard bugs. Skip phases only when explicitly justified.
 
 When exploring the codebase, use the project's domain glossary to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
+## Rationalizations
+| Excuse | Why it's wrong | Do this instead |
+| :--- | :--- | :--- |
+| "I'm pretty sure it's X, I'll just fix it" | A guess that happens to compile isn't a diagnosis — it leaves the real cause in place | Run the Phase 3-4 loop; confirm with a falsifiable prediction before fixing |
+| "It's intermittent, so I can't really test it" | Intermittent means low reproduction rate, not zero — the fix is to raise the rate, not to skip the loop | Loop the trigger, parallelise, add stress (Phase 1, "Non-deterministic bugs") |
+| "The logs look clean, it must be somewhere else" | Clean logs often mean the wrong thing was logged, not that the area is innocent | Add a targeted probe at the boundary that would show the problem if it were there |
+| "It's probably fixed, close enough" | "Probably" is a claim with unexamined assumptions baked in | Run the CLAIM → EXTRACT → DOUBT → RECONCILE → STOP pass before declaring done (Phase 6) |
+
+## Stop-the-line rule
+If a failing test, flaky check, or unexplained error surfaces while you're doing unrelated work, stop immediately. Do not suppress it, retry until it goes green, or route around it — treat it as a bug and run this skill against it before resuming what you were doing.
+
+## Self-doubt protocol: CLAIM → EXTRACT → DOUBT → RECONCILE → STOP
+Before trusting any claim this skill produces, run it through five steps:
+1. **CLAIM** — state the belief as a flat fact ("the cause is X" / "the bug is fixed").
+2. **EXTRACT** — list the assumptions that claim silently depends on (environment, inputs, scope, "no other caller is affected").
+3. **DOUBT** — actively try to break each assumption with a quick check or counter-example. Don't defend the claim; attack it.
+4. **RECONCILE** — keep, demote, or revise the claim based on what DOUBT turned up.
+5. **STOP** — do not proceed to the next phase until this pass is complete.
+
+Applied at two checkpoints: the top-ranked hypothesis in Phase 3 (before instrumenting), and the "it's fixed" claim in Phase 6 (before declaring done). Both are called out again at those phases below.
+
 ## Phase 1 — Build a feedback loop
 
 **This is the skill.** Everything else is mechanical. If you have a fast, deterministic, agent-runnable pass/fail signal for the bug, you will find the cause — bisection, hypothesis-testing, and instrumentation all just consume that signal. If you don't have one, no amount of staring at code will save you.
@@ -78,6 +99,8 @@ If you cannot state the prediction, the hypothesis is a vibe — discard or shar
 
 **Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
 
+**Before moving to Phase 4, run the top-ranked hypothesis through CLAIM → EXTRACT → DOUBT → RECONCILE → STOP** (defined above): state it as fact, extract what it silently assumes, try to break each assumption, then keep/demote/revise the ranking. Only instrument once this pass is done.
+
 ## Phase 4 — Instrument
 
 Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
@@ -109,6 +132,8 @@ If a correct seam exists:
 5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
 
 ## Phase 6 — Cleanup + post-mortem
+
+**Before declaring done, run the claim "the bug is fixed" through CLAIM → EXTRACT → DOUBT → RECONCILE → STOP**: extract what "fixed" assumes (right environment, right inputs, no regression elsewhere), actively try to break the fix, then reconcile. Only proceed to the checklist below once that pass holds up.
 
 Required before declaring done:
 

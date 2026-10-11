@@ -5,7 +5,7 @@ This document defines the core directives, operating rules, and workflow standar
 It is project-agnostic. Everything specific to *this* repository lives in files written by `productivity/setup`:
 
 - [`aiworkspace/host.md`](./aiworkspace/host.md): how the harness is installed (`host_mode`).
-- [`aiworkspace/project.md`](./aiworkspace/project.md): this project's conventions (stack, commands, comment policy, context-file status, extra directives).
+- [`aiworkspace/project.md`](./aiworkspace/project.md): this project's conventions (stack, commands, comment policy, git commit policy, context-file status, extra directives).
 - `aiworkspace/codebase-map.md`: a map of the host codebase, saying where and how to make changes (created with the user's permission).
 - `aiworkspace/brand/`: the brand, with `brand.md` (values, UI technology, and a manifest of every file) plus logos, fonts, tokens, source documents, and reference artifacts (when a brand has been onboarded).
 - `aiworkspace/soul.md`: the project persona agents adopt (workspaces may add their own `soul.md`).
@@ -41,7 +41,8 @@ It is project-agnostic. Everything specific to *this* repository lives in files 
    - Never invent brand colors, fonts, or logos.
 
 5. **Project Conventions & Codebase Context**:
-   - Follow the conventions recorded in [`aiworkspace/project.md`](./aiworkspace/project.md): package manager, languages/stack, build/test/lint commands, comment policy, and any project-specific directives listed there.
+   - Follow the conventions recorded in [`aiworkspace/project.md`](./aiworkspace/project.md): package manager, languages/stack, build/test/lint commands, comment policy, git commit policy, and any project-specific directives listed there.
+   - **Commit policy is opt-in, not a default.** `engineering/software-engineer`'s commit-at-task-granularity behavior and `productivity/process`'s auto-commit step only fire according to `project.md`'s **Commit policy** (`auto` / `ask` / `manual`, set by `productivity/setup` or the first time it comes up). Never commit without checking this setting first, and never assume `auto`.
    - Project-specific directives in `project.md` carry the same force as the directives in this file.
    - **Before planning or writing changes to host code, consult `aiworkspace/codebase-map.md`** (if present) for where the change belongs and how to write it: module map, patterns, conventions, change recipes. Match what's there. If the code contradicts the map, or the map looks stale, say so and offer to re-map ([`engineering/codebase-map`](./aiworkspace/skills/engineering/codebase-map/SKILL.md)).
    - If a convention isn't recorded, infer it from the host repo (lockfiles, manifests, CI config, the codebase map), then **confirm with the user** and record it in `project.md`. Never silently pick one.
@@ -68,6 +69,11 @@ It is project-agnostic. Everything specific to *this* repository lives in files 
    - **Layered, not exclusive**: Tool-specific adapters (e.g. `.claude/skills/<name>/SKILL.md` in Claude Code) may additionally surface these as native commands — that layer is additive, never a replacement.
    - **Natural language still works**: A plain-language request to "move to processing" or "run the finalize gates" invokes the identical skill.
 
+10. **HUMANIZER SKILL REFERENCE (MANDATORY ON GENERATED PROSE)**:
+    - **Standing Requirement, Not Optional Discovery**: Before finalizing any generated prose meant for a human reader — documentation, README content, commit messages, PR/issue descriptions, workspace `definition.md`/`plan.md` narrative sections, chat responses, or any other written content this harness produces — the agent MUST load and follow [`aiworkspace/skills/productivity/humanizer/SKILL.md`](./aiworkspace/skills/productivity/humanizer/SKILL.md) to strip AI writing tells before the content is presented or committed.
+    - **Equivalent Force**: This applies regardless of whether the skill would otherwise surface via normal registry discovery, the same way Directive #8 applies to code.
+    - **Scope Exclusions**: Code, config, data, and verbatim quoted/pasted material are untouched by this directive — only prose the agent itself is authoring is in scope.
+
 ---
 
 ## 🧩 Entry Point & Knowledge Architecture
@@ -79,7 +85,8 @@ Before performing code generation, refactoring, or query tasks, agents MUST cons
 2. **Project Context** (each exists once setup has created it): `aiworkspace/soul.md` (persona), `aiworkspace/codebase-map.md` (where and how to change code), `aiworkspace/brand/` (brand values & files)
 3. **Architecture & Step Pipeline**: [`aiworkspace/README.md`](./aiworkspace/README.md)
 4. **Workspaces & Skills Registry**: [`aiworkspace/index.md`](./aiworkspace/index.md). It lists every domain workspace; open the active one's `index.md` (and its `soul.md`, if present)
-5. **Available Skills**: [`aiworkspace/skills/README.md`](./aiworkspace/skills/README.md)
+5. **Available Skills**: [`aiworkspace/skills/README.md`](./aiworkspace/skills/README.md) — when the right skill (or whether to also spawn a specialist agent) isn't obvious, consult [`skills/using-agent-skills`](./aiworkspace/skills/using-agent-skills/SKILL.md) first.
+6. **Specialist Agents**: [`aiworkspace/agents/README.md`](./aiworkspace/agents/README.md) — fresh, isolated reviewer personas (code-reviewer, test-engineer, security-auditor, performance-auditor) spawned for a second opinion, each loading the skills above.
 
 If the task's workspace is ambiguous (several are listed in `index.md`), ask which one applies.
 
@@ -90,7 +97,7 @@ If the task's workspace is ambiguous (several are listed in `index.md`), ask whi
 - Agents have access to specialized skills in [`aiworkspace/skills/`](./aiworkspace/skills/README.md):
   - **Design**: [`design/README.md`](./aiworkspace/skills/design/README.md) (`brand-guidelines`, `brand-onboarding` — Directive #4)
   - **Engineering**: [`engineering/README.md`](./aiworkspace/skills/engineering/README.md) (`software-engineer` — mandatory, Directive #8 — plus `codebase-map`, `code-review`, `testing`, `diagnose`, `frontend-design`, …)
-  - **Productivity**: [`productivity/README.md`](./aiworkspace/skills/productivity/README.md) (`define`, `plan`, `resources`, `process`, `finalize`, `promote` — the lifecycle, Directive #9 — plus `setup`, `persona`, `grill-me`, `goal-driven`, `handoff`, …)
+  - **Productivity**: [`productivity/README.md`](./aiworkspace/skills/productivity/README.md) (`define`, `plan`, `resources`, `process`, `finalize`, `promote` — the lifecycle, Directive #9 — plus `setup`, `persona`, `grill-me`, `goal-driven`, `handoff`, `humanizer` — mandatory on generated prose, Directive #10, …)
   - **Security**: [`security/README.md`](./aiworkspace/skills/security/README.md) (`security-code-audit`, `ci-cd-security-review`, …)
 - When a task requires a specialized workflow, consult the matching skill's `SKILL.md` and follow its instructions.
 
@@ -151,8 +158,8 @@ When creating or modifying knowledge documents or skills:
 - Include mandatory YAML frontmatter:
   ```yaml
   ---
-  type: skill | dataset | table | metric | playbook | api | domain | resource | plan
-  name: skill-name                                                     # For skills
+  type: skill | agent | dataset | table | metric | playbook | api | domain | resource | plan
+  name: skill-name                                                     # For skills/agents
   title: Concept Title
   description: Clear summary of the concept
   status: draft | processing | finalized
@@ -161,3 +168,4 @@ When creating or modifying knowledge documents or skills:
   ---
   ```
 - Use relative links for cross-references.
+- **`## Rationalizations` (optional)**: any `type: skill` or `type: domain` document whose process has a step agents are tempted to skip, rush, or silently weaken MAY include a table of `Excuse | Why it's wrong | Do this instead`. Placed right after the document's trigger/intro. See [`productivity/write-a-skill`](./aiworkspace/skills/productivity/write-a-skill/SKILL.md) for the exact format and when to add one.

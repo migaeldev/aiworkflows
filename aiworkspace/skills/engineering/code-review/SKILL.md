@@ -15,6 +15,13 @@ Use when reviewing code changes, PRs, or after generating significant code.
 ## Mindset
 Review code as a skeptical senior engineer who has seen LLMs make subtle mistakes. The errors won't be syntax - they'll be conceptual: wrong assumptions, missing edge cases, over-engineering, and silent behavior changes.
 
+## Rationalizations
+| Excuse | Why it's wrong | Do this instead |
+| :--- | :--- | :--- |
+| "The diff is small" | Diff size doesn't predict risk — a one-line change can invert a condition or silently descope a requirement | Run both axes regardless of size |
+| "I wrote it carefully the first time" | The writer is attached to their own decisions and blind to their own assumptions | Review it anyway, or get a fresh second opinion (see Specialist Roster below) |
+| "Spec fidelity doesn't matter if the code is clean" | Clean code that solves the wrong problem is still wrong | Run Axis B independently of Axis A — both must pass |
+
 ## Two Axes
 A review answers two independent questions, and conflating them hides findings:
 - **Axis A — Standards**: is this good code, independent of what it was asked to do?
@@ -62,30 +69,43 @@ Run both. A change can pass one and fail the other — clean code that solves th
 - Do tests actually verify behavior or just check that code runs?
 - Which test type(s) apply here? See `engineering/testing`'s router for what "covered" means per layer.
 
+### 7. Change Sizing
+- Is this diff reviewable in one sitting? Treat ~100 changed lines as a soft ceiling before a split is worth considering — past that, review quality drops regardless of reviewer care.
+- If it's oversized, is that because it's doing more than one thing (splittable: separate the mechanical rename from the behavior change) or because the change is genuinely atomic (not splittable: say so and note why)?
+- Flag an oversized, splittable diff as a finding rather than reviewing it anyway and hoping nothing was missed.
+
 ## Axis B — Spec Fidelity
 Does the implementation actually satisfy what was asked, independent of code quality?
 
-- What was the originating ask? Check `planning/features/<slug>/plan.md` (including its Tasks) and the workspace's `definition.md` (scope and directives) if they exist for this work; otherwise the user's original request and `resources/`.
+- What was the originating ask? Check `planning/features/<slug>/plan.md` (including its Tasks and Constraints) and the workspace's `definition.md` (scope and directives) if they exist for this work; otherwise the user's original request and `resources/`.
 - Does the implementation cover every requirement in that plan — not just the ones that were easiest to build?
 - Did anything get silently descoped, simplified, or reinterpreted without flagging it?
 - Are there requirements the plan stated that this change doesn't address at all?
+- Does the change respect the plan's Constraints section (performance budget, security/compat limits, must-not-break invariants)? A constraint that was quietly weakened to make something easier is a finding, not a tradeoff.
 - Flag anything that quietly changed the ask rather than fulfilling it.
+
+## Severity Labels
+Tag every finding with one of these — they replace "is this critical or just a suggestion" guesswork with a shared vocabulary:
+- **CRITICAL** — must be fixed before merge (either axis).
+- **NIT** — a style/polish point; correct as-is, this would just be cleaner. Fine to merge without fixing.
+- **OPTIONAL** — a real improvement, not required. The author's call whether to take it.
+- **FYI** — informational only; no action implied, just context worth knowing.
 
 ## Output Format
 ```markdown
 ## Code Review Summary
 
 ### Standards Findings
-[Axis A: assumptions, over-engineering, consistency, collateral damage, tradeoffs, test coverage]
+[Axis A: assumptions, over-engineering, consistency, collateral damage, tradeoffs, test coverage, change sizing — each tagged CRITICAL/NIT/OPTIONAL/FYI]
 
 ### Spec-Fidelity Findings
-[Axis B: requirements met, requirements missed, silent descoping/reinterpretation]
+[Axis B: requirements met, requirements missed, silent descoping/reinterpretation — each tagged CRITICAL/NIT/OPTIONAL/FYI]
 
 ### Critical Issues
-[Issues that must be fixed before merge, from either axis]
+[Every CRITICAL finding from either axis, collected here so they can't be missed]
 
 ### Suggestions
-[Improvements that would make the code better]
+[NIT/OPTIONAL findings — improvements that would make the code better but don't block merge]
 
 ### Simplification Opportunities
 [Places where code could be reduced without losing functionality]
@@ -95,64 +115,25 @@ Does the implementation actually satisfy what was asked, independent of code qua
 ```
 
 ## Multi-Agent Review Pattern
-Agent Best Practice: Run separate AI agent instances or subagents in parallel—one writing code, another reviewing.
+The agent that wrote the code has inherent biases — attached to its own decisions, unlikely to question its own assumptions, context filled with implementation details rather than review perspective. A fresh, isolated agent instance reviews with no such baggage.
 
-### Why Separate Instances
-The agent that wrote the code has inherent biases:
-- Attached to its own implementation decisions
-- May not question its own assumptions
-- Context filled with implementation details, not review perspective
+### Specialist Roster
+Rather than writing a one-off reviewer prompt each time, spawn one of the standing personas in [`aiworkspace/agents/README.md`](../../../agents/README.md) as a **fresh** subagent (no shared context with the writer), framed "you did not write this code":
 
-A fresh, isolated agent instance:
-- Reviews with fresh eyes
-- Questions decisions the writer took for granted
-- Catches issues the writer is blind to
+| Persona | Loads | Scope |
+| :--- | :--- | :--- |
+| `code-reviewer` | this skill | dual-axis Standards + Spec Fidelity |
+| `test-engineer` | `engineering/testing` + `test-first` | coverage and test quality |
+| `security-auditor` | the applicable `security/*` skills | OWASP, injection, DoS, transport |
+| `performance-auditor` | `engineering/web-performance-audit` | Core Web Vitals, bundle size, render blocking |
 
-### How to Set Up
+### When to Use
+- Security-sensitive code → `security-auditor`
+- Frontend/perf-sensitive code → `performance-auditor`
+- Complex business logic, code that will be hard to change later, or before merging significant PRs → `code-reviewer` (and `test-engineer` if coverage is in doubt)
+- Any time you want a second opinion untainted by implementation bias
 
-**Session / Agent 1 - Writer:**
-```bash
-# Agent Session 1: Implement the feature
-```
-
-**Session / Agent 2 - Reviewer:**
-```bash
-# Agent Session 2 or Subagent invocation:
-# "Review the changes in src/feature/.
-#  You did NOT write this code. Review critically for:
-#  - Hidden assumptions
-#  - Missing edge cases
-#  - Over-engineering
-#  - Security issues
-#  - Performance problems"
-```
-
-### Review Prompts for Reviewer Instance
-
-```markdown
-Review the following code changes as if you're seeing them for the first time.
-You did NOT write this code. Be skeptical.
-
-Focus on:
-1. What assumptions does this code make that aren't validated?
-2. What inputs would break this?
-3. Is there a simpler way to achieve the same result?
-4. What's missing from the error handling?
-5. Are there any security implications?
-
-Be direct about issues. Don't soften criticism.
-```
-
-### When to Use Multi-Agent Review
-- Security-sensitive code
-- Complex business logic
-- Code that will be hard to change later
-- Before merging significant PRs
-- When you want a second opinion
-
-Axis B (Spec Fidelity) benefits most from this pattern specifically, since a
-reviewer untainted by implementation bias is better positioned to notice
-quiet scope changes than the agent that made them.
+Axis B (Spec Fidelity) benefits most from this pattern specifically, since a reviewer untainted by implementation bias is better positioned to notice quiet scope or constraint changes than the agent that made them.
 
 ## Persisted Output
 Write the full Output Format block above to `finalized/review.md` (OKF

@@ -33,6 +33,9 @@ Interview the user relentlessly about a plan or design until reaching shared und
 ### [`handoff`](./handoff/SKILL.md)
 Compact the current conversation into a handoff document for another agent to pick up.
 
+### [`humanizer`](./humanizer/SKILL.md)
+Rewrite AI-sounding text so it reads like the writer without changing what it says, based on Wikipedia's "Signs of AI writing" patterns.
+
 ### [`persona`](./persona/SKILL.md)
 Create or change a `soul.md` persona — project-wide or per workspace — so the agent speaks, codes, and designs as the project itself. Command: `/persona`.
 
@@ -40,10 +43,10 @@ Create or change a `soul.md` persona — project-wide or per workspace — so th
 Step 1 of the lifecycle — plan a feature, change, or batch of work as `plan.md` with an ordered task list and resources needed; hands off to `define` if the workspace doesn't exist yet.
 
 ### [`process`](./process/SKILL.md)
-Step 3 of the lifecycle — one re-invocable round of active iteration in processing/, loading `software-engineer` when code is involved.
+Step 3 of the lifecycle — one re-invocable round of active iteration in processing/, loading `software-engineer` when code is involved. `/process auto` runs every remaining task in one approved pass, still test-driven and halting on failure.
 
 ### [`promote`](./promote/SKILL.md)
-Step 5 of the lifecycle — human-authorized deployment of audited finalized/ content to production.
+Step 5 of the lifecycle — human-authorized deployment of audited finalized/ content to production, gated by a pre-promote rollback/staged-rollout/monitoring checklist.
 
 ### [`resources`](./resources/SKILL.md)
 Step 2 of the lifecycle — catalog or request the input context, schemas, and raw data a workspace needs.

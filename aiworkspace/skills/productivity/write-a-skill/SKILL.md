@@ -52,9 +52,15 @@ timestamp: 2026-09-09T13:45:03+02:00
 
 # Skill Name
 
-## Quick start
+## Trigger
 
-[Minimal working example]
+[When to use this skill]
+
+## Rationalizations (optional — add when the skill enforces costly discipline)
+
+| Excuse | Why it's wrong | Do this instead |
+| :--- | :--- | :--- |
+| [Common excuse to skip/rush/weaken a step] | [Why that reasoning fails] | [The right move instead] |
 
 ## Workflows
 
@@ -64,6 +70,9 @@ timestamp: 2026-09-09T13:45:03+02:00
 
 [Link to separate files: See [REFERENCE.md](REFERENCE.md)]
 ```
+
+### When to add a `## Rationalizations` table
+This is an OKF-level convention (see `AGENTS.md`'s "OKF Formatting Standard"), available to any `type: skill` or `type: domain` document — not just this template. Add one when the skill's process includes a step that's costly or inconvenient to follow (testing, review, a verification gate, a diagnosis loop) and agents are likely to talk themselves out of it. Keep it short — 3-6 rows naming the actual excuses seen in practice, not a generic list. Place it right after the skill's `## Trigger`/intro, before the main process. Skip it entirely for skills with no tempting shortcut (e.g. a pure lookup or formatting skill).
 
 ## Description Requirements
 
@@ -119,6 +128,7 @@ After drafting, verify:
 
 - [ ] Frontmatter contains `type: skill` (OKF standard)
 - [ ] Description includes triggers ("Use when...")
+- [ ] `## Rationalizations` added if the skill enforces costly discipline; omitted otherwise
 - [ ] SKILL.md under 100 lines
 - [ ] No time-sensitive info
 - [ ] Consistent terminology

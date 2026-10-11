@@ -1,6 +1,6 @@
 ---
 name: process
-description: "Run one round of Step 3 work in processing/ — take the next tasks from the feature's plan.md, do them, tick them off, and load engineering/software-engineer whenever code is involved. Re-invocable; each run is one more round, not an auto-advance. Use for /process, or when actively iterating in processing/."
+description: "Run one round of Step 3 work in processing/ — take the next tasks from the feature's plan.md, do them, tick them off, and load engineering/software-engineer whenever code is involved. Re-invocable; each run is one more round, not an auto-advance. `/process auto` runs every remaining task in one approved pass, still test-driven and halting on failure. Use for /process or /process auto, or when actively iterating in processing/."
 argument-hint: "[workspace/feature] [task]"
 ---
 

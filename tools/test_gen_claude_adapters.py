@@ -43,6 +43,12 @@ class ParseCommandsTest(unittest.TestCase):
         self.assertEqual(commands[1].target, "aiworkspace/skills/productivity/define/SKILL.md")
         self.assertEqual(commands[1].stage, "Step 0 — Define")
 
+    def test_primary_cell_may_carry_notes_after_the_command(self):
+        table = TABLE.replace("| `/define` |", "| `/define` (`quick` variant: `/define quick`) |")
+        define, = [c for c in gen.parse_commands(table) if c.stage == "Step 0 — Define"]
+        self.assertEqual(define.primary, "define")
+        self.assertEqual(define.aliases, ["spec", "step0"])
+
     def test_missing_table_raises(self):
         with self.assertRaises(ValueError):
             gen.parse_commands("# no table here\n")

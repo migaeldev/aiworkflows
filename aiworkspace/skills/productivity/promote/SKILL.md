@@ -16,6 +16,13 @@ Use only when explicitly requested by the human. Never self-trigger — `AGENTS.
 1. Read `host_mode` from `aiworkspace/host.md`. If it is `unset` or missing, stop and run `productivity/setup` first.
 2. Confirm `finalized/` has passed Step 4 — `finalized/review.md` exists and `log.md` records the gate results. If not, stop and say what's missing.
 
+## Pre-Promote Checklist
+Answer each explicitly in `log.md` alongside the promote entry — `N/A — <reason>` is a valid answer, a silent skip is not:
+- **Rollback**: if this needs to be reverted after going live, how? (revert the commit/promote, flip a feature flag, restore the previous `apps/<workspace>/` contents) — name the actual mechanism, not "we'll figure it out."
+- **Supersedes an existing path?** If this replaces a production code path, endpoint, or data format that already has callers, [`engineering/deprecation-migration`](../../engineering/deprecation-migration/SKILL.md) should already have been applied in `processing/` — confirm it was, don't improvise a migration here.
+- **Staged rollout**: is this going live for everyone at once, or behind a flag / gradual rollout? If gradual, name the mechanism and the criteria for widening it.
+- **Monitoring**: can you tell, after this is live, whether it's working? If the change added a new service/endpoint/job, [`engineering/observability`](../../engineering/observability/SKILL.md) should already have given it visibility — confirm it did.
+
 ## Process — `monorepo`
 1. **Copy** audited content from `finalized/` into `apps/<workspace>/`, verbatim.
 2. **Populate** `apps/<workspace>/README.md` as a standalone production guide: full developer setup, environment variable tables, and — if the app has one — the `.env.template` embedded inline as a copyable code block.
@@ -30,7 +37,7 @@ Use only when explicitly requested by the human. Never self-trigger — `AGENTS.
 
 ## Then, both modes
 1. **Update `aiworkspace/index.md`** — set this workspace's Production Location (`apps/<workspace>/`, or "host repo — see Target Map").
-2. **Log it** — append to the workspace's `log.md`: date, files promoted, destinations.
+2. **Log it** — append to the workspace's `log.md`: date, files promoted, destinations, and the Pre-Promote Checklist answers from above.
 3. **Clean up** — clear temporary files in this workspace's `resources/` and `processing/`, after confirming with the human which (if any) to keep.
 
 ## Notes

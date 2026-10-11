@@ -39,13 +39,15 @@ All agents working in `aiworkspace/` are bound by [`AGENTS.md`](../AGENTS.md). I
 ## 🏛️ Architecture Overview
 
 1. **Domain Workspaces (`aiworkspace/workspaces/`)**: Work partitioned into a 6-step lifecycle (`define` ➔ `plan` ➔ `resources` ➔ `processing` ➔ `finalized` ➔ `promote`). New workspaces are created by `define`, which copies `workspaces/template-workspace/`.
-2. **AI Skills Registry (`aiworkspace/skills/`)**: Skills categorized and formatted as OKF documents (`type: skill`).
-3. **Production**: wherever `host.md` says — `apps/<workspace>/` or the host repo's own paths — written only by a human-approved `promote`.
+2. **AI Skills Registry (`aiworkspace/skills/`)**: Skills categorized and formatted as OKF documents (`type: skill`). [`skills/using-agent-skills`](./skills/using-agent-skills/SKILL.md) is the router: consult it first when it isn't obvious which skill (or specialist agent) a task needs.
+3. **Specialist Agents (`aiworkspace/agents/`)**: Fresh, isolated reviewer personas (`type: agent`) — code-reviewer, test-engineer, security-auditor, performance-auditor — spawned for a second opinion. Each one loads skills from the registry above rather than duplicating them. See [`agents/README.md`](./agents/README.md).
+4. **Production**: wherever `host.md` says — `apps/<workspace>/` or the host repo's own paths — written only by a human-approved `promote`.
 
 ```mermaid
 graph TD
     Root["aiworkspace/"] --> Workspaces["workspaces/"]
     Root --> Skills["skills/ (Skills Registry)"]
+    Root --> Agents["agents/ (Specialist Reviewer Personas)"]
     Root --> Config["host.md · project.md · codebase-map.md · brand/ · soul.md (written by setup)"]
 
     Workspaces --> Domain["<domain>/"]
@@ -58,10 +60,16 @@ graph TD
     Step5 --> Mono["monorepo: apps/<workspace>/"]
     Step5 --> Bolt["bolt-on: Production Target Map"]
 
+    Skills --> Meta["using-agent-skills (router)"]
     Skills --> Design["design/"]
     Skills --> Eng["engineering/"]
     Skills --> Prod["productivity/"]
     Skills --> Sec["security/"]
+
+    Agents --> CodeReviewer["code-reviewer"]
+    Agents --> TestEngineer["test-engineer"]
+    Agents --> SecurityAuditor["security-auditor"]
+    Agents --> PerfAuditor["performance-auditor"]
 ```
 
 ---
@@ -71,12 +79,23 @@ graph TD
 Every skill is an OKF document (`type: skill`) with structured YAML frontmatter.
 
 - **Master Skills Index**: [`skills/README.md`](./skills/README.md)
+- **Router**: [`skills/using-agent-skills`](./skills/using-agent-skills/SKILL.md) — a top-level meta-skill (not inside any category) that maps task shape to the skill (or specialist agent) to load.
 - **Onboarding a repository**: [`productivity/setup`](./skills/productivity/setup/SKILL.md)
 - **Categories**:
   - [`skills/design/README.md`](./skills/design/README.md) (Brand guidelines & brand onboarding)
   - [`skills/engineering/README.md`](./skills/engineering/README.md) (Codebase map, review, testing, debugging, architecture, frontend)
   - [`skills/productivity/README.md`](./skills/productivity/README.md) (Lifecycle, onboarding, persona, handoffs, skill authoring)
   - [`skills/security/README.md`](./skills/security/README.md) (CI/CD security & code audits)
+
+---
+
+## 🕵️ Specialist Agents (`aiworkspace/agents/`)
+
+Fresh, isolated reviewer personas (OKF `type: agent`) spawned for a second opinion — someone who "wasn't in the room" when the code was written. Each one loads and uses skills from the registry above rather than duplicating their content.
+
+- **Registry**: [`agents/README.md`](./agents/README.md)
+- **Roster**: `code-reviewer` (loads `engineering/code-review`), `test-engineer` (loads `engineering/testing` + `test-first`), `security-auditor` (loads the applicable `security/*` skills), `performance-auditor` (loads `engineering/web-performance-audit`)
+- **When to spawn one vs. load a skill directly**: load a skill yourself when you're the one doing the work; spawn an agent when you want an independent second opinion that isn't biased by having written the change. See [`skills/using-agent-skills`](./skills/using-agent-skills/SKILL.md) for the full decision table.
 
 ---
 
@@ -106,6 +125,7 @@ Every skill is an OKF document (`type: skill`) with structured YAML frontmatter.
 - **Purpose**: Active workspace where code, drafts, and iterative content live.
 - **Human In The Loop**: All modifications, reviews, and reframing by humans happen here.
 - **Rule**: **Never move files to `finalized/` without explicit human instruction.**
+- **Auto mode**: `/process auto` runs every remaining task in one pass after a single upfront approval, still test-driven and ticked off one at a time, halting immediately on failure or an undecidable task. See [`productivity/process`](./skills/productivity/process/SKILL.md).
 
 ### Step 4: `finalized/` (Audit, Verification Gates & Code Transfer)
 - **Trigger**: ONLY when explicitly instructed by the human.
@@ -115,7 +135,8 @@ Every skill is an OKF document (`type: skill`) with structured YAML frontmatter.
   2. **📖 API Specification** *(only if an HTTP/REST API is exposed or changed)*: OpenAPI 3.x spec.
   3. **📄 Production-Ready Documentation** *(always)*: READMEs, plus architecture/deployment notes where warranted.
   4. **🧪 Verification & Tests** *(always)*: The build/lint/test commands from [`project.md`](./project.md). If no test suite exists, record what verification was done instead.
-- Plus the dual-axis [`engineering/code-review`](./skills/engineering/code-review/SKILL.md), persisted to `finalized/review.md`.
+- **Evidence rule**: every `PASS` logged against a gate must cite the evidence that earned it (test output, build log excerpt, the file/section reviewed, the audit findings file) — an uncited `PASS` is itself a `FAIL`, and no check may be silenced or skipped to force a green run.
+- Plus the dual-axis [`engineering/code-review`](./skills/engineering/code-review/SKILL.md), persisted to `finalized/review.md`, checked against the plan's Constraints section as well as its Tasks.
 
 ### Step 5: `promote` (Human Authorization & Production Deployment)
 - **Trigger**: ONLY when explicitly requested by the human. Driven by [`productivity/promote`](./skills/productivity/promote/SKILL.md).
@@ -148,7 +169,8 @@ Every skill is an OKF document (`type: skill`) with structured YAML frontmatter.
     │   ├── docs/                      # Source brand documents (guidelines PDF, voice & tone)
     │   └── references/                # Artifacts: mockups, screenshots, moodboards, approved designs
     ├── soul.md                        # Project persona (/persona)
-    ├── skills/                        # design / engineering / productivity / security
+    ├── skills/                        # using-agent-skills (router) / design / engineering / productivity / security
+    ├── agents/                        # Specialist reviewer personas (code-reviewer, test-engineer, security-auditor, performance-auditor)
     └── workspaces/
         ├── template-workspace/        # Boilerplate copied by /define
         └── <domain>/
@@ -170,9 +192,9 @@ Every document across `skills/`, `resources/`, `processing/`, and `finalized/` i
 
 ```yaml
 ---
-type: skill | dataset | table | metric | playbook | api | domain | resource | plan  # REQUIRED
+type: skill | agent | dataset | table | metric | playbook | api | domain | resource | plan  # REQUIRED
 scope: workspace | feature                                            # For type: plan only
-name: skill-identifier                                                 # For skills
+name: skill-identifier                                                 # For skills/agents
 title: Human-readable Title                                            # Recommended
 description: Concise description of the concept                         # Recommended
 status: draft | processing | finalized                                  # Recommended
@@ -180,6 +202,8 @@ tags: [analytics, customer, key-metric]                                # Optiona
 timestamp: 2026-09-09T13:45:03+02:00                                    # Optional (ISO-8601)
 ---
 ```
+
+**`## Rationalizations` (optional section)**: any `type: skill` or `type: domain` document whose process has a step agents are tempted to skip, rush, or silently weaken may include a table of `Excuse | Why it's wrong | Do this instead`, placed right after the document's trigger/intro. See [`productivity/write-a-skill`](./skills/productivity/write-a-skill/SKILL.md).
 
 ---
 
@@ -196,6 +220,8 @@ timestamp: 2026-09-09T13:45:03+02:00                                    # Option
 | **Project Persona** | `aiworkspace/soul.md` | Voice, code style, values — project-wide |
 | **Workspace Persona** | `aiworkspace/workspaces/<domain>/soul.md` | Optional per-workspace overrides |
 | **Skills Registry** | `aiworkspace/skills/README.md` | All available skills |
+| **Skills Router** | `aiworkspace/skills/using-agent-skills/SKILL.md` | Task shape → skill/agent to load |
+| **Specialist Agents Registry** | `aiworkspace/agents/README.md` | Fresh-subagent reviewer personas |
 | **Domain Entrypoint** | `aiworkspace/workspaces/<domain>/index.md` | Identity, instructions, production pointer |
 | **Domain Log** | `aiworkspace/workspaces/<domain>/log.md` | Audit & change log |
 | **Step 0 - Define** | `aiworkspace/workspaces/<domain>/definition.md` | Workspace core definition |
@@ -220,7 +246,7 @@ Every command is a faster on-ramp into the same skill content above, never a rep
 | Step 0 — Define | `/define` | `/spec`, `/step0`, `/new-workspace` | [`skills/productivity/define/SKILL.md`](./skills/productivity/define/SKILL.md) |
 | Step 1 — Plan | `/plan` | `/step1`, `/research` | [`skills/productivity/plan/SKILL.md`](./skills/productivity/plan/SKILL.md) |
 | Step 2 — Resources | `/resources` | `/step2` | [`skills/productivity/resources/SKILL.md`](./skills/productivity/resources/SKILL.md) |
-| Step 3 — Processing | `/process` | `/step3`, `/processing` | [`skills/productivity/process/SKILL.md`](./skills/productivity/process/SKILL.md) |
+| Step 3 — Processing | `/process` (`auto` variant: `/process auto`) | `/step3`, `/processing` | [`skills/productivity/process/SKILL.md`](./skills/productivity/process/SKILL.md) |
 | Step 4 — Finalize | `/finalize` | `/step4`, `/approve` | [`skills/productivity/finalize/SKILL.md`](./skills/productivity/finalize/SKILL.md) |
 | Step 5 — Promote | `/promote` | `/step5`, `/deploy` | [`skills/productivity/promote/SKILL.md`](./skills/productivity/promote/SKILL.md) |
 

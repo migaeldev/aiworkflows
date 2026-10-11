@@ -40,6 +40,10 @@ _Filled in by `productivity/setup`. Until then, values read `unset`/`pending`. F
 
 - **Comment policy**: unset _(`follow-existing: <scheme>` / `add: <scheme>` / `minimal` / `none`)_
 
+## Git Workflow
+
+- **Commit policy**: unset _(`auto` — `productivity/process` commits each completed task automatically, no confirmation needed / `ask` — it proposes the commit and waits for a yes before running it / `manual` — it never runs `git commit`, only notes the change is ready with a suggested message)_. Asked once, the first time it matters, by `productivity/setup` or `productivity/process`; change it any time by editing this value.
+
 ## Project-Specific Directives
 
 _Rules that apply to every workspace in this repo, with the same force as `AGENTS.md`. Example: "Use pnpm, never npm or yarn." Leave empty if none._

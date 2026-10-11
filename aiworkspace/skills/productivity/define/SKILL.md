@@ -51,7 +51,7 @@ Invoke [`productivity/grill-me`](../grill-me/SKILL.md): one question at a time, 
 2. **Scope**: what's in, and what's explicitly out, especially relative to neighboring workspaces.
 3. **Users & stakeholders**: who uses its output, and who approves it.
 4. **Success criteria**: observable, checkable outcomes that say the workspace is doing its job.
-5. **Constraints & directives**: rules this workspace must never break (data, security, compliance, performance, dependencies).
+5. **Constraints & directives**: rules this workspace must never break (data, security, compliance, performance, dependencies). If any of these is the kind of rule that's easy to quietly erode under time pressure, offer to record a `## Rationalizations` table (`Excuse | Why it's wrong | Do this instead`) in `index.md`'s Domain Directives section alongside it — the OKF convention described in `AGENTS.md`'s "OKF Formatting Standard."
 6. **Production target**:
    - `monorepo` → confirm `apps/<name>/`.
    - `bolt-on` → which host-repo paths its output lands in. Seed the Production Target Map, using the codebase map's Module Map and Change Recipes to propose paths.

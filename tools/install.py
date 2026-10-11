@@ -31,7 +31,7 @@ BLOCK_START = "<!-- aiworkspace:start (managed by the aiworkspace installer; edi
 BLOCK_END = "<!-- aiworkspace:end -->"
 _BLOCK_START_PREFIX = "<!-- aiworkspace:start"
 
-CORE_DIRS = ["aiworkspace/skills", "aiworkspace/workspaces/template-workspace"]
+CORE_DIRS = ["aiworkspace/skills", "aiworkspace/scripts", "aiworkspace/workspaces/template-workspace"]
 CORE_FILES = ["aiworkspace/README.md"]
 INSTANCE_FILES = ["aiworkspace/host.md", "aiworkspace/project.md", "aiworkspace/index.md"]
 BLOCK_FILES = ["AGENTS.md", "CLAUDE.md"]
@@ -197,7 +197,9 @@ def _print_report(report: Report, target: Path, dry_run: bool) -> None:
         print("Already up to date.")
     host = target / "aiworkspace" / "host.md"
     if not dry_run and host.exists() and "host_mode: unset" in host.read_text(encoding="utf-8"):
-        print("\nNext: open the repository in your agent and run /setup.")
+        print("\nNext:")
+        print("  1. Point each AI tool you use at AGENTS.md:  python aiworkspace/scripts/agent_pointers.py")
+        print("  2. Open the repository in your agent and run /setup.")
 
 
 def main() -> int:

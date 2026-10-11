@@ -12,6 +12,9 @@ This category contains skills related to software engineering, code review, test
 
 ## Available Skills
 
+### [`api-interface-design`](./api-interface-design/SKILL.md)
+Contract-first design for anything consumed by code outside your direct control — Hyrum's Law, the One-Version Rule, error semantics, and boundary validation.
+
 ### [`code-review`](./code-review/SKILL.md)
 Review code like a skeptical senior engineer on two axes — standards/quality and spec fidelity. Surface hidden assumptions, check for over-engineering, verify test coverage, and check requirements weren't silently descoped.
 
@@ -20,6 +23,9 @@ With permission, map the host codebase into `aiworkspace/codebase-map.md` — st
 
 ### [`codebase-design`](./codebase-design/SKILL.md)
 Shared vocabulary and principles for module depth, interfaces, and seams — the deletion test, "the interface is the test surface," and the design-it-twice parallel sub-agent pattern for exploring alternative interfaces.
+
+### [`deprecation-migration`](./deprecation-migration/SKILL.md)
+Code-as-liability mindset for retiring old code paths safely — compulsory vs advisory deprecation, migration patterns (strangler fig, shadow/parallel-run, flag-gated cutover), and zombie-code removal.
 
 ### [`diagnose`](./diagnose/SKILL.md)
 A disciplined diagnosis loop for hard bugs and performance regressions. Reproduce → minimise → hypothesise → instrument → fix → regression-test.
@@ -32,6 +38,9 @@ Create distinctive, production-grade frontend interfaces with high design qualit
 
 ### [`improve-codebase-architecture`](./improve-codebase-architecture/SKILL.md)
 Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one is picked. Builds on `codebase-design`, `domain-modeling`, and `productivity/grill-me`.
+
+### [`observability`](./observability/SKILL.md)
+Structured logging, RED metrics (Rate/Errors/Duration), tracing, and symptom-based alerting — instrument as you build, not after an incident forces you to.
 
 ### [`prototype`](./prototype/SKILL.md)
 Build a throwaway prototype to answer a design question — a single-file logic demo for state-model sanity checks, or switchable UI variants on a route for "what should this look like?"
@@ -50,3 +59,6 @@ Decide which test type(s) a change needs — unit, integration, functional, or e
 
 ### [`visual-iteration`](./visual-iteration/SKILL.md)
 UI feedback loop using screenshots. Provide design mock, implement, screenshot result, and iterate until matching target.
+
+### [`web-performance-audit`](./web-performance-audit/SKILL.md)
+Audit frontend code for Core Web Vitals regressions, bundle bloat, render-blocking resources, and wasteful client-side fetching. Measure before guessing; rank by real user impact.

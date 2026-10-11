@@ -12,6 +12,13 @@ timestamp: 2026-10-04T00:00:00+02:00
 ## Trigger
 Use when deciding what kind of test a change needs, or when `engineering/code-review`'s Standards axis asks "is this covered?" and you need to know what "covered" means for this layer.
 
+## Rationalizations
+| Excuse | Why it's wrong | Do this instead |
+| :--- | :--- | :--- |
+| "This is too hard to test" | Hard-to-test usually means the seam is wrong, not that the test should be skipped | Find or create the right seam; flag the architecture issue if none exists |
+| "An e2e test already covers this" | One slow, broad test rarely pins down a specific unit's behavior, and failures there are hard to localize | Add the unit/integration test that isolates this specific risk |
+| "It's just a UI tweak" | Visual changes break layout, accessibility, and interaction states just as easily as logic changes | Pick the type from the table below like any other change |
+
 ## Decision table
 
 | What's changing | Test type | Reference |

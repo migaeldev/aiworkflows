@@ -61,9 +61,10 @@ def parse_commands(readme: str) -> list:
         link = re.search(r"\]\(\./([^)]+)\)", target)
         if not link:
             raise ValueError(f"no skill link for {primary}")
+        # The cell may carry notes after the command, e.g. "`/process` (`auto` variant: `/process auto`)".
         commands.append(Command(
             stage=stage,
-            primary=primary.strip("`/"),
+            primary=re.match(r"`/([^`\s]+)", primary).group(1),
             aliases=re.findall(r"`/([^`]+)`", aliases),
             target=f"aiworkspace/{link.group(1)}",
         ))
